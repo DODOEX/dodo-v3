@@ -1,0 +1,9 @@
+ds-test/=forge-lib/forge-std/lib/ds-test/src/
+eth-gas-reporter/=node_modules/eth-gas-reporter/
+forge-std/=forge-lib/forge-std/src/
+hardhat-deploy/=node_modules/hardhat-deploy/
+hardhat/=node_modules/hardhat/
+D3Vault/=contracts/DODOV3MM/D3Vault/
+D3Pool/=contracts/DODOV3MM/D3Pool/
+periphery/=contracts/DODOV3MM/periphery/
+mock/=contracts/mock/
