@@ -65,6 +65,8 @@ contract D3VaultLiquidation is D3VaultFunding {
         record.interestIndex = info.borrowIndex;
         IERC20(collateral).safeTransferFrom(pool, msg.sender, collateralAmount);
         ID3MM(pool).updateReserveByVault(collateral);
+        
+        emit Liquidate(pool, collateral, collateralAmount, debt, debtToCover);
     }
 
     // ---------- Liquidate by DODO team ----------
@@ -89,6 +91,7 @@ contract D3VaultLiquidation is D3VaultFunding {
             uint256 debt = _borrowAmount(record.amount, record.interestIndex, info.borrowIndex).mul(ratio); // borrowAmount = record.amount * newIndex / oldIndex
             liquidationTarget[pool][token] = debt;
         }
+        emit StartLiquidation(pool);
     }
 
     function liquidateByDODO(
@@ -152,7 +155,6 @@ contract D3VaultLiquidation is D3VaultFunding {
             // The liquidation process will not repay the interests. Thus all dToken holders will share the loss equally.
             uint256 realDebt = _borrowAmount(borrows, record.interestIndex, info.borrowIndex); // borrowAmount = record.amount * newIndex / oldIndex
             IERC20(token).safeTransferFrom(pool, address(this), debt);
-            ID3MM(pool).updateReserveByVault(token);
 
             if (info.totalBorrows < realDebt) {
                 info.totalBorrows = 0;
@@ -164,5 +166,6 @@ contract D3VaultLiquidation is D3VaultFunding {
         }
 
         ID3MM(pool).finishLiquidation();
+        emit FinishLiquidation(pool);
     }
 }

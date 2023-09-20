@@ -41,7 +41,7 @@ contract D3VaultFunding is D3VaultStorage {
         IDToken(info.dToken).mint(user, dTokenAmount);
         info.balance = realBalance;
 
-        emit UserDeposit(user, token, amount);
+        emit UserDeposit(user, token, amount, dTokenAmount);
     }
 
     /// @param to who receive tokens
@@ -63,7 +63,7 @@ contract D3VaultFunding is D3VaultStorage {
         // In the meantime, some users may hope to use this function directly,
         // to prevent these users fill "user" param with wrong addresses,
         // we use "msg.sender" param to check.
-        emit UserWithdraw(msg.sender, user, token, amount);
+        emit UserWithdraw(msg.sender, user, token, amount, dTokenAmount);
     }
 
     // ---------- Pool Fund ----------
@@ -149,7 +149,7 @@ contract D3VaultFunding is D3VaultStorage {
     /// @notice Step4: calculate increased borrows, reserves
     /// @notice Step5: update borrows, reserves, accrual time, borrowIndex
     /// @notice borrowIndex is the accrual interest rate
-    function _accrueInterestForRead(address token) internal view returns(uint256 totalBorrowsNew, uint256 totalReservesNew, uint256 borrowIndexNew, uint256 accrualTime) {
+    function accrueInterestForRead(address token) public view returns(uint256 totalBorrowsNew, uint256 totalReservesNew, uint256 borrowIndexNew, uint256 accrualTime) {
         AssetInfo storage info = assetInfo[token];
 
         uint256 currentTime = block.timestamp;
@@ -173,7 +173,7 @@ contract D3VaultFunding is D3VaultStorage {
     /// @notice Accrue interest for a token, change storage
     function accrueInterest(address token) public {
         (assetInfo[token].totalBorrows, assetInfo[token].totalReserves, assetInfo[token].borrowIndex, assetInfo[token].accrualTime) =
-        _accrueInterestForRead(token);
+        accrueInterestForRead(token);
     }
 
     function accrueInterests() public {
@@ -201,7 +201,7 @@ contract D3VaultFunding is D3VaultStorage {
     function getPoolLeftQuota(address pool, address token) public view returns(uint256 leftQuota) {
         uint256 quota = ID3PoolQuota(_POOL_QUOTA_).getPoolQuota(pool, token);
         uint256 oldInterestIndex = assetInfo[token].borrowRecord[pool].interestIndex;
-        ( , ,uint256 currentInterestIndex, ) = _accrueInterestForRead(token);
+        ( , ,uint256 currentInterestIndex, ) = accrueInterestForRead(token);
         uint256 usedQuota = _borrowAmount(assetInfo[token].borrowRecord[pool].amount, oldInterestIndex, currentInterestIndex); // borrowAmount = record.amount * newIndex / oldIndex
         leftQuota = quota > usedQuota ? quota - usedQuota : 0;
     }
@@ -350,7 +350,7 @@ contract D3VaultFunding is D3VaultStorage {
     // ======================= Read Only =======================
 
     function getExchangeRate(address token) public view returns(uint256 exchangeRate) {
-        (uint256 totalBorrows, uint256 totalReserves, ,) = _accrueInterestForRead(token);
+        (uint256 totalBorrows, uint256 totalReserves, ,) = accrueInterestForRead(token);
         uint256 cash = getCash(token);
         uint256 dTokenSupply = IERC20(assetInfo[token].dToken).totalSupply();
         if (dTokenSupply == 0) { return 1e18; }

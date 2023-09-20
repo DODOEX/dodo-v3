@@ -16,15 +16,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await deployTokens();
     await deployD3Oracle(false);
     await deployD3RateManager(false);
+    await deployFeeRateModel();
     await deployRouter();
     await deployLiquidatorAdapter();
     await deployD3PoolQuota();
     await deployD3Vault(false);
     await depolyD3MMFactory();
     await deployD3Proxy();
+    await deployD3UserQuota();
   }
 
-  async function deployContract(name: string, contract: string, args: any[]) {
+  async function deployContract(name: string, contract: string, args?: any[]) {
+    if (typeof args == 'undefined') {
+      args = []
+    }
     if (!config.deployedAddress[name] || config.deployedAddress[name] == "") {
       console.log("Deploying contract:", name);
       const deployResult = await deploy(contract, {
@@ -150,14 +155,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await deployContract("MockRouter", "MockRouter", [oracleAddress]);
   }
 
-  async function deployLiquidatorAdapter() {
-    await deployContract("D3MMLiquidationRouter", "D3MMLiquidationRouter", [config.defaultAddress.DODOApprove]);
+  async function deployFeeRateModel() {
+    await deployContract("FeeRateModel", "MockFeeRateModel");
   }
 
-  async function deployD3UserQuota() {
-    const tokenHold = config.deployedAddress.dodoAddress;
-    const vault = config.deployedAddress.D3Vault;
-    await deployContract("D3UserQuota", "D3UserQuota", [tokenHold, vault]);
+  async function deployLiquidatorAdapter() {
+    await deployContract("D3MMLiquidationRouter", "D3MMLiquidationRouter", [config.defaultAddress.DODOApprove]);
   }
 
   async function deployD3PoolQuota() {
@@ -166,12 +169,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   async function deployD3Vault(shouldSet: boolean) {
     const vaultAddress = await deployContract("D3Vault", "D3Vault", []);
+    const dTokenAddress = await deployContract("D3TokenTemplate", "D3Token")
     if (shouldSet) {
       const D3Vault = await ethers.getContractAt("D3Vault", vaultAddress);
       console.log("set CloneFactory address...")
       await D3Vault.setCloneFactory(config.deployedAddress.CloneFactory);
       console.log("set D3Token template...")
-      await D3Vault.setDTokenTemplate(config.deployedAddress.D3TokenTemplate);
+      await D3Vault.setDTokenTemplate(dTokenAddress);
       console.log("set D3Oracle address...")
       await D3Vault.setNewOracle(config.deployedAddress.D3Oracle);
       console.log("set D3PoolQuota address...")
@@ -202,7 +206,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       feeModel,
       maintainer 
     ];
-    await deployContract("D3MMFactory", "D3MMFactory", args);
+    const d3MMFactory = await deployContract("D3MMFactory", "D3MMFactory", args);
+    await verifyContract(d3MMFactory, args)
   }
 
   async function deployD3Proxy() {
@@ -213,6 +218,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const weth = config.defaultAddress.wethAddress
     console.log("weth", weth)
     await deployContract("D3Proxy", "D3Proxy", [dodoApproveProxy, weth, vault])
+  }
+
+  async function deployD3UserQuota() {
+    const dodo = config.deployedAddress.dodoAddress
+    const vault = config.deployedAddress.D3Vault
+    await deployContract("D3UserQuota", "D3UserQuota", [dodo, vault])
   }
 
   // ---------- helper function ----------

@@ -8,5 +8,5 @@
 pragma solidity 0.8.16;
 
 interface IFeeRateModel {
-    function getFeeRate() external view returns (uint256);
+    function getFeeRate(address token) external view returns (uint256);
 }

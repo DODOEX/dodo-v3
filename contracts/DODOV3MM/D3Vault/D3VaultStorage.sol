@@ -65,10 +65,37 @@ contract D3VaultStorage is ReentrancyGuard, Ownable {
 
     event PoolBorrow(address indexed pool, address indexed token, uint256 amount, uint256 interests);
     event PoolRepay(address indexed pool, address indexed token, uint256 amount, uint256 interests);
-    event UserDeposit(address indexed user, address indexed token, uint256 amount);
-    event UserWithdraw(address indexed msgSender, address indexed user, address indexed token, uint256 amount);
+    event UserDeposit(address indexed user, address indexed token, uint256 amount, uint256 dTokenAmount);
+    event UserWithdraw(address indexed msgSender, address indexed user, address indexed token, uint256 amount, uint256 dTokenAmount);
     event AddPool(address pool);
     event RemovePool(address pool);
+
+    event SetCloneFactory(address cloneFactory);
+    event SetD3Factory(address factory);
+    event SetD3UserQuota(address userQuota);
+    event SetD3PoolQuota(address poolQuota);
+    event SetOracle(address oracle);
+    event SetRateManager(address rateManager);
+    event SetMaintainer(address maintainer);
+    event SetIM(uint256 IM);
+    event SetMM(uint256 MM);
+    event SetDiscount(uint256 discount);
+    event SetDTokenTemplate(address template);
+    
+    event AddRouter(address router);
+    event RemoveRouter(address router);
+    
+    event AddLiquidator(address liquidator);
+    event RemoveLiquidator(address liquidator);
+    
+    event AddToken(address token);
+    event SetToken(address token);
+
+    event Liquidate(address indexed pool, address indexed collateral, uint256 collateralAmount, address indexed debt, uint256 debtAmount);
+    event StartLiquidation(address pool);
+    event FinishLiquidation(address pool);
+
+    event WithdrawReserves(address indexed token, uint256 amount);
 
     modifier onlyLiquidator() {
         require(allowedLiquidator[msg.sender], Errors.NOT_ALLOWED_LIQUIDATOR);

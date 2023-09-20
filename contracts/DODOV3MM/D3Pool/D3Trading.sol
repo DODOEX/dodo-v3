@@ -252,7 +252,7 @@ contract D3Trading is D3Funding {
     }
 
     function _updateCumulative(address token) internal {
-        uint256 tokenIndex = ID3Maker(state._MAKER_).getOneTokenOriginIndex(token);
+        uint256 tokenIndex = uint256(ID3Maker(state._MAKER_).getOneTokenOriginIndex(token));
         uint256 tokenFlag = (allFlag >> tokenIndex) & 1;
         if (tokenFlag == 0) {
             tokenCumMap[token].cumulativeAsk = 0;

@@ -17,6 +17,7 @@ import {ID3MM} from "../intf/ID3MM.sol";
 contract D3Maker is InitializableOwnable {
     MakerTypes.MakerState internal state;
     address public _POOL_;
+    address[] internal poolTokenlist;
 
     // ============== Event =============
     // use operatorIndex to distinct different setting, 1 = setMaxInterval  2 = setTokensPrice, 3 = setNSPriceSlot,
@@ -42,7 +43,7 @@ contract D3Maker is InitializableOwnable {
             return (tokenMMInfo, 0);
         }
         // get mtFee
-        uint256 mtFeeRate = ID3MM(_POOL_).getFeeRate();
+        uint256 mtFeeRate = ID3MM(_POOL_).getFeeRate(token);
         // deal with priceInfo
         uint80 priceInfo = getOneTokenPriceSet(token);
         (
@@ -59,7 +60,7 @@ contract D3Maker is InitializableOwnable {
         tokenMMInfo.bidAmount = MakerTypes.parseBidAmount(amountInfo);
         tokenMMInfo.kAsk = MakerTypes.parseK(state.tokenMMInfoMap[token].kAsk);
         tokenMMInfo.kBid = MakerTypes.parseK(state.tokenMMInfoMap[token].kBid);
-        tokenIndex = getOneTokenOriginIndex(token);
+        tokenIndex = uint256(getOneTokenOriginIndex(token));
     }
 
     // ================== Read parameters ==============
@@ -79,9 +80,9 @@ contract D3Maker is InitializableOwnable {
     }
 
     /// @notice get one token index. odd for none-stable, even for stable,  true index = (tokenIndex[address] - 1) / 2
-    function getOneTokenOriginIndex(address token) public view returns (uint256) {
-        require(state.priceListInfo.tokenIndexMap[token] > 0, Errors.INVALID_TOKEN);
-        return state.priceListInfo.tokenIndexMap[token] - 1;
+    function getOneTokenOriginIndex(address token) public view returns (int256) {
+        //require(state.priceListInfo.tokenIndexMap[token] > 0, Errors.INVALID_TOKEN);
+        return int256(state.priceListInfo.tokenIndexMap[token]) - 1;
     }
 
     /// @notice get all stable token Info
@@ -129,6 +130,10 @@ contract D3Maker is InitializableOwnable {
         }
     }
 
+    function getPoolTokenListFromMaker() external view returns(address[] memory tokenlist) {
+        return poolTokenlist;
+    }
+
     // ============= Set params ===========
 
     /// @notice maker could use multicall to set different params in one tx.
@@ -166,6 +171,7 @@ contract D3Maker is InitializableOwnable {
         // check amount
         require(kAsk >= 0 && kAsk <= 10000, Errors.K_LIMIT);
         require(kBid >= 0 && kBid <= 10000, Errors.K_LIMIT);
+        poolTokenlist.push(token);
 
         // set new token info
         state.tokenMMInfoMap[token].priceInfo = priceSet;
