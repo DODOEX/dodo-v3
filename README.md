@@ -143,4 +143,4 @@ remapping: `@openzeppelin/contracts=node_modules/@openzeppelin/contracts`
 import: `import "@openzeppelin/contracts/token/ERC20/ERC20.sol";`
 
 ## Audit
-DODO V3 has been audited by [Sherlock](https://audits.sherlock.xyz/contests/89).
+DODO V3 has been audited by [Sherlock](https://audits.sherlock.xyz/contests/89). The current main branch is the final audited version.
