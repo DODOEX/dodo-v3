@@ -141,3 +141,6 @@ install: `yarn add -D @openzeppelin/contracts`
 remapping: `@openzeppelin/contracts=node_modules/@openzeppelin/contracts`
 
 import: `import "@openzeppelin/contracts/token/ERC20/ERC20.sol";`
+
+## Audit
+DODO V3 has been audited by [Sherlock](https://audits.sherlock.xyz/contests/89).
