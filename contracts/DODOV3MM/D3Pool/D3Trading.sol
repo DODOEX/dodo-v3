@@ -111,7 +111,9 @@ contract D3Trading is D3Funding {
         // external call & swap callback
         IDODOSwapCallback(msg.sender).d3MMSwapCallBack(fromToken, fromAmount, data);
         // transfer mtFee to maintainer
-        _transferOut(state._MAINTAINER_, toToken, mtFee);
+        if(mtFee > 0) {
+            _transferOut(state._MAINTAINER_, toToken, mtFee);
+        }
 
         require(
             IERC20(fromToken).balanceOf(address(this)) - state.balances[fromToken] >= fromAmount,
@@ -151,7 +153,9 @@ contract D3Trading is D3Funding {
         // external call & swap callback
         IDODOSwapCallback(msg.sender).d3MMSwapCallBack(fromToken, payFromAmount, data);
         // transfer mtFee to maintainer
-        _transferOut(state._MAINTAINER_, toToken, mtFee);
+        if(mtFee > 0 ) {
+            _transferOut(state._MAINTAINER_, toToken, mtFee);
+        }
 
         require(
             IERC20(fromToken).balanceOf(address(this)) - state.balances[fromToken] >= payFromAmount,
@@ -199,7 +203,7 @@ contract D3Trading is D3Funding {
         uint256 mtFeeRate = D3State.fromTokenMMInfo.mtFeeRate +  D3State.toTokenMMInfo.mtFeeRate;
         mtFee = DecimalMath.mulFloor(receiveToAmount, mtFeeRate);
 
-        return (payFromAmount, receiveToAmount - swapFee, vusdAmount, swapFee, mtFee);
+        return (payFromAmount, receiveToAmount - mtFee, vusdAmount, swapFee, mtFee);
     }
 
     /// @notice user could query sellToken result deducted swapFee, assign toAmount
@@ -222,7 +226,7 @@ contract D3Trading is D3Funding {
         swapFee = DecimalMath.mulFloor(toAmount, swapFeeRate);
         uint256 mtFeeRate = D3State.fromTokenMMInfo.mtFeeRate +  D3State.toTokenMMInfo.mtFeeRate;
         mtFee = DecimalMath.mulFloor(toAmount, mtFeeRate);
-        toAmountWithFee = toAmount + swapFee;
+        toAmountWithFee = toAmount + mtFee;
         }
 
         require(toAmountWithFee <= state.balances[toToken], Errors.BALANCE_NOT_ENOUGH);

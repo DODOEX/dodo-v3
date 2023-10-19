@@ -78,7 +78,7 @@ library MakerTypes {
         uint256 bidDownRate = priceInfo & 0xffff;
 
         // swap fee rate standarlize
-        swapFee = swapFeeRate * (10 ** 14) + mtFeeRate;
+        swapFee = swapFeeRate * (10 ** 14);
         uint256 swapFeeSpread = DecimalMath.mul(midPriceWithDecimal, swapFee);
 
         // ask price standarlize
