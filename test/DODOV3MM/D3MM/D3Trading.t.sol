@@ -31,11 +31,11 @@ contract D3TradingTest is TestContext {
     function testReadFunctions() public {
         (uint256 askDownPrice, uint256 askUpPrice, uint256 bidDownPrice, uint256 bidUpPrice, uint256 swapFee) =
             d3MM.getTokenMMPriceInfoForRead(address(token2));
-        assertEq(askDownPrice, 12009600000000000000);
+        assertEq(askDownPrice, 12007200000000000000);
         assertEq(askUpPrice, 12027600000000000000);
-        assertEq(bidDownPrice, 83400053376034161);
+        assertEq(bidDownPrice, 83383363351344140);
         assertEq(bidUpPrice, 83458521115005843);
-        assertEq(swapFee, 800000000000000);
+        assertEq(swapFee, 600000000000000);
 
         //console.log(askDownPrice);
         //console.log(askUpPrice);
@@ -82,7 +82,7 @@ contract D3TradingTest is TestContext {
         //console.log(receiveToToken);
         assertEq(beforeBalance2 - afterBalance2, 1 ether);
         assertEq(afterBalance3 - beforeBalance3, receiveToToken);
-        assertEq(afterBalance3 - beforeBalance3, 11959881980233813532);
+        assertEq(afterBalance3 - beforeBalance3, 11978524479259449453);
     }
 
     function testNormalBuyTokens() public {
@@ -115,7 +115,7 @@ contract D3TradingTest is TestContext {
         //console.log(afterBalance3 - beforeBalance3);
 
         assertEq(beforeBalance2 - afterBalance2, receiveToToken);
-        assertEq(beforeBalance2 - afterBalance2, 83601350012314569); // 0.08
+        assertEq(beforeBalance2 - afterBalance2, 83468096707748715); // 0.08
         assertEq(afterBalance3 - beforeBalance3, 1 ether);
     }
 
@@ -210,7 +210,7 @@ contract D3TradingTest is TestContext {
 
         (, , , , , cumulativeBid)
         = d3MM.getTokenMMOtherInfoForRead(address(token2));
-        assertEq(cumulativeBid, 1002401946807995096); // 1.002 suppose 1 vusd
+        assertEq(cumulativeBid, 1001001236331550199); // 1.001 suppose 1 vusd
         //console.log("cumualativeBid:", cumulativeBid);
 
         beforeBalance2 = afterBalance2;
@@ -234,7 +234,7 @@ contract D3TradingTest is TestContext {
         //console.log(receiveToToken);
         assertEq(beforeBalance2 - afterBalance2, 1000); 
         assertEq(afterBalance3 - beforeBalance3, receiveToToken);
-        assertEq(afterBalance3 - beforeBalance3, 11959586831563309114); // suppose 12
+        assertEq(afterBalance3 - beforeBalance3, 11978141873757971225); // suppose 12
     }
 
     function testMinMaxRevert() public {
@@ -377,14 +377,14 @@ contract D3TradingTest is TestContext {
         uint256 afterBalance2 = token2.balanceOf(user1);
         uint256 afterBalanceEx = tokenEx.balanceOf(user1);
         
-        assertEq(afterBalance2 - beforeBalance2, 1996802085427539929); // 1.99 near 2
-        assertEq(beforeBalanceEx - afterBalanceEx, 1001602215640904029); // 1.00 near 1
+        assertEq(afterBalance2 - beforeBalance2, 1998398178385100244); // 1.99 near 2
+        assertEq(beforeBalanceEx - afterBalanceEx, 1000801105666936279); // 1.00 near 1
         //console.log(afterBalance2 - beforeBalance2);
         //console.log(beforeBalanceEx - afterBalanceEx);
 
         uint256 token2Res = d3MM.getTokenReserve(address(token2));
         //console.log("token2Res:", token2Res);
-        assertEq(token2Res, 11002398554762593269); // 11.0 > borrow 10
+        assertEq(token2Res, 11000802302535914122); // 11.0 > borrow 10
         uint256 colR = d3Vault.getCollateralRatio(address(d3MM));
         //console.log(colR);
         assertEq(colR, type(uint256).max);
@@ -449,11 +449,11 @@ contract D3TradingTest is TestContext {
 
         (uint256 askDownPrice, uint256 askUpPrice, uint256 bidDownPrice, uint256 bidUpPrice, uint256 swapFee) =
             d3MM.getTokenMMPriceInfoForRead(address(token1));
-        assertEq(askDownPrice, 30455502800000000000000);
+        assertEq(askDownPrice, 30449419000000000000000);
         assertEq(askUpPrice, 30723190000000000000000);
-        assertEq(bidDownPrice, 32913686897337);
+        assertEq(bidDownPrice, 32907097570631);
         assertEq(bidUpPrice, 33206253003091);
-        assertEq(swapFee, 1200000000000000);
+        assertEq(swapFee, 1000000000000000);
 
         //console.log(askDownPrice);
         //console.log(askUpPrice);
@@ -467,11 +467,11 @@ contract D3TradingTest is TestContext {
 
         (askDownPrice, askUpPrice, bidDownPrice, bidUpPrice, swapFee) =
             d3MM.getTokenMMPriceInfoForRead(address(token2));
-        assertEq(askDownPrice, 999999960000000000);
+        assertEq(askDownPrice, 999800000000000000);
         assertEq(askUpPrice, 1000799800000000000);
-        assertEq(bidDownPrice, 1000400120032008002);
+        assertEq(bidDownPrice, 1000200040008001601);
         assertEq(bidUpPrice, 1001201241249250852);
-        assertEq(swapFee, 200000000000000);
+        assertEq(swapFee, 0);
 
         (,,kask, kbid,,) = d3MM.getTokenMMOtherInfoForRead(address(token2));
         assertEq(kask, 0);
@@ -506,13 +506,13 @@ contract D3TradingTest is TestContext {
             block.timestamp + 1000
         );
         // token2's balance max 100 ether
-        assertEq(receiveToToken, 99860000000000000000);
+        assertEq(receiveToToken, 99960000000000000000);
 
         (,,, ,uint256 cumulativeAsk, uint256 cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
-        assertEq(cumulativeAsk, 100 ether);
+        assertEq(cumulativeAsk, 100060000000000000000);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeBid, 303824951342633192532);
+        assertEq(cumulativeBid, 303885789307408018586);
         assertEq(cumulativeAsk, 0);
 
         token2.mint(address(d3MM), 400 ether);
@@ -530,14 +530,14 @@ contract D3TradingTest is TestContext {
             block.timestamp + 1000
         );
 
-        assertEq(receiveToToken, 303399567233725215991);
+        assertEq(receiveToToken, 303824958558415332845);
 
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
-        assertEq(cumulativeAsk, 403824922124699795704);
+        assertEq(cumulativeAsk, 404188905095588617491);
         //console.log(cumulativeAsk - 100 ether);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeBid, 607649861314336103249);
+        assertEq(cumulativeBid, 607771537173258008457);
         //console.log(cumulativeBid - 303823704036065356124);
         assertEq(cumulativeAsk, 0);
     }
@@ -564,14 +564,14 @@ contract D3TradingTest is TestContext {
             block.timestamp + 1000
         );
 
-        assertEq(receiveToToken, 327757); //0.00327, near 0.00329
+        assertEq(receiveToToken, 328216); //0.00328, near 0.00329
 
         (,,, ,uint256 cumulativeAsk, uint256 cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeAsk, 3282160000000000); //0.00328 ether
+        assertEq(cumulativeAsk, 3285440000000000); //0.00328 ether
         //console.log(cumulativeAsk);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
-        assertEq(cumulativeBid, 99960003999999999900);
+        assertEq(cumulativeBid, 99979999999999999900);
         //console.log(cumulativeBid);
         assertEq(cumulativeAsk, 0);
 
@@ -628,15 +628,15 @@ contract D3TradingTest is TestContext {
 
         //uint256 balance2 = d3MM.getTokenReserve(address(token1));
         //console.log("pool balance token1:", balance2);
-        assertEq(receiveToToken, 99860000);
+        assertEq(receiveToToken, 99960000);
 
         (,,, , cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
         //assertEq(cumulativeAsk, 3282160000000000); //0.00328 ether
-        assertEq(cumulativeAsk, 1000000000000000000);
+        assertEq(cumulativeAsk, 1000600000000000000);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
         //assertEq(cumulativeBid, 99960003999999999900);
-        assertEq(cumulativeBid, 39984001599999999960000);
+        assertEq(cumulativeBid, 39991999999999999960000);
         //assertEq(cumulativeBid, );
         assertEq(cumulativeAsk, 0);
         }
@@ -665,14 +665,14 @@ contract D3TradingTest is TestContext {
         );
 
         //console.log(payFromToken);
-        assertEq(payFromToken, 3295); 
+        assertEq(payFromToken, 3291); 
 
         (,,, ,uint256 cumulativeAsk, uint256 cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
-        assertEq(cumulativeAsk, 1001400000000000000); // 1 ether
+        assertEq(cumulativeAsk, 1001000000000000000); // 1 ether
         //console.log(cumulativeAsk);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeBid, 1001399959944000000); // 1 ether
+        assertEq(cumulativeBid, 1000199920000000000); // 1 ether
         //console.log(cumulativeBid);
         assertEq(cumulativeAsk, 0);
         }
@@ -729,14 +729,14 @@ contract D3TradingTest is TestContext {
         );
 
         //console.log(payFromToken);
-        assertEq(payFromToken, 305103461545737399619); 
+        assertEq(payFromToken, 304676950368205693279); 
 
         (,,, ,uint256 cumulativeAsk, uint256 cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeAsk, 10014000000000000); // 0.01 ether
+        assertEq(cumulativeAsk, 10010000000000000); // 0.01 ether
         //console.log(cumulativeAsk);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
-        assertEq(cumulativeBid, 304981432365257566465); // 304 ether
+        assertEq(cumulativeBid, 304616014978132051934); // 304 ether
         //console.log(cumulativeBid);
         assertEq(cumulativeAsk, 0);
         }
@@ -815,14 +815,14 @@ contract D3TradingTest is TestContext {
             block.timestamp + 1000
         );
         //console.log(payFromToken);
-        assertEq(payFromToken, 771702);  //0.077
+        assertEq(payFromToken, 770475);  //0.077
 
         (,,, ,uint256 cumulativeAsk, uint256 cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token24));
-        assertEq(cumulativeAsk, 10016000000000000000); // 10 ether
+        assertEq(cumulativeAsk, 10012000000000000000); // 10 ether
         //console.log(cumulativeAsk);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeBid, 10024079484791858627); // 10 ether
+        assertEq(cumulativeBid, 10010102042080981350); // 10 ether
         //console.log(cumulativeBid);
         assertEq(cumulativeAsk, 0);
 
@@ -839,16 +839,57 @@ contract D3TradingTest is TestContext {
             block.timestamp + 1000
         );
         //console.log(receiveToToken);
-        assertEq(receiveToToken, 12_9580_23095_55504_85733_37600);  //12.9 token24
+        assertEq(receiveToToken, 12978504141578036786079600 );  //12.9 token24
 
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token24));
-        assertEq(cumulativeAsk, 22994789158208181664); // 22 ether, this time = 12.9 ether
+        assertEq(cumulativeAsk, 23006084578722788330); // 22 ether, this time = 12.9 ether
         //console.log(cumulativeAsk);
         assertEq(cumulativeBid, 0);
         (,,, ,cumulativeAsk, cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token1));
-        assertEq(cumulativeBid, 23013536496933983488); // 23 ether, this time = 13 ether
+        assertEq(cumulativeBid, 23002016635982823165); // 23 ether, this time = 13 ether
         //console.log(cumulativeBid);
         assertEq(cumulativeAsk, 0);
     }
-    
+
+    function testExtraFee() public {
+        vm.prank(owner);
+        feeRateModel.setFeeRate(0);
+
+        token2ChainLinkOracle.feedData(212 * 1e18);
+        token3ChainLinkOracle.feedData(1 * 1e18);
+
+        address[] memory tokens = new address[](2);
+        uint64[] memory amounts = new uint64[](2);
+        uint80[] memory prices = new uint80[](2);
+        uint32[] memory ks = new uint32[](2);
+
+        tokens[0] = address(token3); //usdt
+        tokens[1] = address(token2); //bnb
+        amounts[0] = stickAmount(60000, 18, 60000, 18);
+        amounts[1] = stickAmount(400, 18, 60000, 18);
+        prices[0] = stickPrice(10000, 14, 1, 2, 2);
+        prices[1] = stickPrice(21195, 16, 2, 100, 100);
+        ks[0] = stickKs(1, 1);
+        ks[1] = stickKs(1, 1);
+
+        vm.startPrank(maker);
+        d3MakerWithPool.setTokensAmounts(tokens, amounts);
+        d3MakerWithPool.setTokensKs(tokens, ks);
+        d3MakerWithPool.setTokensPrice(tokens, prices);
+        vm.stopPrank();
+
+        Types.TokenMMInfo memory tokenMMInfo;
+        uint256 tokenIndex;
+        (tokenMMInfo, tokenIndex) = d3MakerWithPool.getTokenMMInfoForPool(address(token3));
+        console.log(tokenMMInfo.askUpPrice);
+        console.log(tokenMMInfo.askDownPrice);
+        console.log(tokenMMInfo.bidUpPrice);
+        console.log(tokenMMInfo.bidDownPrice);
+
+        console.log("query");
+        (uint256 fromAmount, uint256 toAmount, uint256 vusd, ,) = d3MM.querySellTokens(address(token2), address(token3), 10000);
+        console.log(fromAmount);
+        console.log(toAmount);
+        console.log(vusd);
+    }
 }

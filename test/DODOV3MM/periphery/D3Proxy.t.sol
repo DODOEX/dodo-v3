@@ -135,7 +135,7 @@ contract D3ProxyTest is TestContext {
             block.timestamp + 1000
         );
 
-        assertEq(receiveToToken, 919998); //0.00919, weth is 12, token1 is 1300, near 0.00923
+        assertEq(receiveToToken, 921436); //0.00919, weth is 12, token1 is 1300, near 0.00923
         //console.log("sell directly:", receiveToToken);
 
         uint256 beforeBalance2 = user1.balance;
@@ -179,7 +179,7 @@ contract D3ProxyTest is TestContext {
         //console.log("weth:", beforeBalance2 - afterBalance2);
         //console.log(afterBalance3 - beforeBalance3);
         assertEq(beforeBalance2 - afterBalance2, 1 ether);
-        assertEq(afterBalance3 - beforeBalance3, 11956536767856879680); // 11.9, token3 is 1, near 12
+        assertEq(afterBalance3 - beforeBalance3, 11974218097561551094); // 11.9, token3 is 1, near 12
 
         // if msg.value mismatch fromAmount, should revert
         vm.deal(user1, 2 ether);
@@ -249,7 +249,7 @@ contract D3ProxyTest is TestContext {
 
         //console.log(payFromAmount);
         //console.log(beforeBalance2 - afterBalance2);
-        assertEq(beforeBalance2 - afterBalance2, 1003369134268833132);
+        assertEq(beforeBalance2 - afterBalance2, 1001809084464781831);
         assertEq(beforeBalance2 - afterBalance2, payFromAmount);
         assertEq(afterBalance3 - beforeBalance3, 1 ether);
     }
@@ -312,7 +312,7 @@ contract D3ProxyTest is TestContext {
 
         //console.log("eth:", afterBalance2 - beforeBalance2);
         //console.log(beforeBalance3 - afterBalance3 );
-        assertEq(afterBalance2 - beforeBalance2, 996775265755655500); // 0.99, suppose 1
+        assertEq(afterBalance2 - beforeBalance2, 998365344116153351); // 0.99, suppose 1
         assertEq(beforeBalance3 - afterBalance3, 12 ether);
     }
 
@@ -375,7 +375,7 @@ contract D3ProxyTest is TestContext {
         //console.log("eth:", afterBalance2 - beforeBalance2);
         //console.log(beforeBalance3 - afterBalance3 );
         assertEq(afterBalance2 - beforeBalance2, 1 ether);
-        assertEq(beforeBalance3 - afterBalance3, 12038792297894767191);
+        assertEq(beforeBalance3 - afterBalance3, 12019646772033312087);
     }
 
     function testSwapCallBack() public {

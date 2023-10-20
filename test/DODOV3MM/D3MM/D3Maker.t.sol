@@ -69,9 +69,9 @@ contract MakerTest is TestContext {
 
         (tokenMMInfo, tokenIndex) = d3Maker.getTokenMMInfoForPool(address(token1));
         assertEq(tokenMMInfo.askUpPrice, 130156 * (10 ** 16));
-        assertEq(tokenMMInfo.askDownPrice, 130104 * (10 ** 16));
+        assertEq(tokenMMInfo.askDownPrice, 130078 * (10 ** 16));
         assertEq(tokenMMInfo.bidUpPrice, 770000770000771); //1298.7
-        assertEq(tokenMMInfo.bidDownPrice, 769846646548008); // 1298.96
+        assertEq(tokenMMInfo.bidDownPrice, 769692584781639); // 1299.22
         assertEq(tokenMMInfo.askAmount, 30 * (10 ** 18));
         assertEq(tokenMMInfo.bidAmount, 30 * (10 ** 18));
 
@@ -83,9 +83,9 @@ contract MakerTest is TestContext {
 
         (tokenMMInfo, tokenIndex) = d3Maker.getTokenMMInfoForPool(address(token4));
         assertEq(tokenMMInfo.askUpPrice, 130156 * (10 ** 16));
-        assertEq(tokenMMInfo.askDownPrice, 130104 * (10 ** 16));
+        assertEq(tokenMMInfo.askDownPrice, 130078 * (10 ** 16));
         assertEq(tokenMMInfo.bidUpPrice, 770000770000771); //1298.7
-        assertEq(tokenMMInfo.bidDownPrice, 769846646548008); // 1298.96
+        assertEq(tokenMMInfo.bidDownPrice, 769692584781639); // 1299.22
         assertEq(tokenMMInfo.askAmount, 30 * (10 ** 18));
         assertEq(tokenMMInfo.bidAmount, 30 * (10 ** 18));
 
@@ -127,9 +127,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token1));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
 
             flag = d3MM.getTokenFlag(address(token1));
             assertEq(flag, 0);
@@ -148,9 +148,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token2));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
 
             flag = d3MM.getTokenFlag(address(token1));
             assertEq(flag, 0);
@@ -173,9 +173,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token4));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
 
             flag = d3MM.getTokenFlag(address(token1));
             assertEq(flag, 0);
@@ -220,9 +220,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token1));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
 
             flag = d3MM.getTokenFlag(address(token1));
             assertEq(flag, 0);
@@ -245,9 +245,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token2));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
 
             flag = d3MM.getTokenFlag(address(token1));
             assertEq(flag, 0);
@@ -287,9 +287,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token3));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
         }
 
         // set 2 token
@@ -309,9 +309,9 @@ contract MakerTest is TestContext {
             // check
             (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token4));
             assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-            assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+            assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
             assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-            assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+            assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
         }
 
         // prices and slots not match
@@ -414,9 +414,9 @@ contract MakerTest is TestContext {
         //check
         (Types.TokenMMInfo memory tokenMMInfo,) = d3Maker.getTokenMMInfoForPool(address(token1));
         assertEq(tokenMMInfo.askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-        assertEq(tokenMMInfo.askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+        assertEq(tokenMMInfo.askDownPrice, 27896728 * (10 ** 15)); // 27896.728
         assertEq(tokenMMInfo.bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-        assertEq(tokenMMInfo.bidDownPrice, 35896723117375); // 1/27857.696
+        assertEq(tokenMMInfo.bidDownPrice, 35889539462559); // 1/27863.272
         assertEq(tokenMMInfo.askAmount, 40 * (10 ** 18));
         assertEq(tokenMMInfo.bidAmount, 40 * (10 ** 18));
 

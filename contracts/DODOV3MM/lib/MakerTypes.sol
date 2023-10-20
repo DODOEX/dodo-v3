@@ -63,7 +63,7 @@ library MakerTypes {
         amountWithDecimal = bidAmount * (10 ** bidAmountDecimal);
     }
 
-    function parseAllPrice(uint80 priceInfo, uint256 mtFeeRate)
+    function parseAllPrice(uint80 priceInfo)
         internal
         pure
         returns (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee)

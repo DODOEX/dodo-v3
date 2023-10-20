@@ -22,12 +22,12 @@ contract MakerTypesHelper {
         return bidAmount;
     }
 
-    function parseAllPrice(uint80 priceInfo, uint256 tokenDecimal, uint256 mtFeeRate)
+    function parseAllPrice(uint80 priceInfo)
         external
         pure
         returns (uint256 , uint256 , uint256 , uint256 , uint256)
     {
-        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) =  MakerTypes.parseAllPrice(priceInfo, mtFeeRate);
+        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) =  MakerTypes.parseAllPrice(priceInfo);
         return (askUpPrice, askDownPrice,  bidUpPrice, bidDownPrice, swapFee);
     }
 
@@ -63,28 +63,29 @@ contract MakerTypeTest is TestContext {
 
     function testParseAllPrice() public {
         uint80 priceInfo = stickPrice(27880, 18, 6, 12, 10);
-        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) = makerTypes.parseAllPrice(priceInfo, 18, (2*10**14)); //0.02%
+        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) = makerTypes.parseAllPrice(priceInfo); //0.02%
         assertEq(askUpPrice, 27913456 * (10 ** 15)); // 27913.456
-        assertEq(askDownPrice, 27902304 * (10 ** 15)); // 27902.304
+        assertEq(askDownPrice, 27896728 * (10 ** 15)); // 27896.728
         assertEq(bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
-        assertEq(bidDownPrice, 35896723117375); // 1/27857.696, 27880 - 27880 * 0.08% = 27867.696
-        assertEq(swapFee, 8 * (10 ** 14)); //0.08%
+        assertEq(bidDownPrice, 35889539462559); // 1/27863.272, 27880 - 27880 * 0.06% = 27863.272
+        assertEq(swapFee, 6 * (10 ** 14)); //0.06%
 
-        (askUpPrice, askDownPrice, bidUpPrice, bidDownPrice, swapFee) = makerTypes.parseAllPrice(priceInfo, 8, (2*10**14));
+        (askUpPrice, askDownPrice, bidUpPrice, bidDownPrice, swapFee) = makerTypes.parseAllPrice(priceInfo);
         assertEq(askUpPrice, 27913456 * (10 ** 15)); //decimal is still 18
-        assertEq(askDownPrice, 27902304 * (10 ** 15)); // decimal is still 18
+        assertEq(askDownPrice, 27896728 * (10 ** 15)); // decimal is still 18
         assertEq(bidUpPrice, 35903909648530); //  decimal is 18, 0.00003590
-        assertEq(bidDownPrice, 35896723117375); // decimal is 18
-        assertEq(swapFee, 8 * (10 ** 14));
+        assertEq(bidDownPrice, 35889539462559); // decimal is 18
+        assertEq(swapFee, 6 * (10 ** 14));
     }
 
     function testPriceInvalid() public {
-        uint80 priceInfo = stickPrice(27880, 18, 6, 12, 10);
+        uint80 priceInfo = stickPrice(27880, 18, 13, 12, 14);
         vm.expectRevert(bytes("ask price invalid"));
-        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) = makerTypes.parseAllPrice(priceInfo, 18, 10**15);
+        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) = makerTypes.parseAllPrice(priceInfo);
 
+        priceInfo = stickPrice(27880, 18, 11, 12, 10);
         vm.expectRevert(bytes("bid price invalid"));
-        (askUpPrice, askDownPrice, bidUpPrice, bidDownPrice, swapFee) = makerTypes.parseAllPrice(priceInfo, 8, (5*10**14));
+        (askUpPrice, askDownPrice, bidUpPrice, bidDownPrice, swapFee) = makerTypes.parseAllPrice(priceInfo);
     }
 
 }
