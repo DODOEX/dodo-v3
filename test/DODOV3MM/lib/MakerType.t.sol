@@ -78,6 +78,16 @@ contract MakerTypeTest is TestContext {
         assertEq(swapFee, 6 * (10 ** 14));
     }
 
+    function testParseAllPriceWithZeroFeeRate() public {
+        uint80 priceInfo = stickPrice(27880, 18, 0, 12, 10);
+        (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee) = makerTypes.parseAllPrice(priceInfo); //0.02%
+        assertEq(askUpPrice, 27913456 * (10 ** 15)); // 27913.456
+        assertEq(askDownPrice, 27880 * (10 ** 18)); // 27896.728
+        assertEq(bidUpPrice, 35903909648530); // 1/27852.12, 27880 - 27880 * 0.1% =27852.12
+        assertEq(bidDownPrice, 35868005738881); // 1/27880
+        assertEq(swapFee, 0); //0.06%
+    }
+
     function testPriceInvalid() public {
         uint80 priceInfo = stickPrice(27880, 18, 13, 12, 14);
         vm.expectRevert(bytes("ask price invalid"));

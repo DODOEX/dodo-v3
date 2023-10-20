@@ -85,6 +85,49 @@ contract D3TradingTest is TestContext {
         assertEq(afterBalance3 - beforeBalance3, 11978524479259449453);
     }
 
+    function testNormalSellTokens_LpFeeRateZero() public {
+        ( , ,address poolMaker, , ) = d3MM.getD3MMInfo();
+        d3MakerWithPool = D3Maker(poolMaker);
+        vm.startPrank(maker);
+
+        address[] memory tokenList = new address[](1);
+        tokenList[0] = address(token2);
+        uint80[] memory priceList = new uint80[](1);
+        priceList[0] = stickPrice(12, 18, 0, 23, 15);
+        d3MakerWithPool.setTokensPrice(tokenList, priceList);
+        vm.stopPrank();
+
+        uint256 beforeBalance2 = token2.balanceOf(user1);
+        uint256 beforeBalance3 = token3.balanceOf(user1);
+
+        SwapCallbackData memory swapData;
+        swapData.data = "";
+        swapData.payer = user1;
+
+        uint256 gasleft1 = gasleft();
+        vm.prank(user1);
+        uint256 receiveToToken = d3Proxy.sellTokens(
+            address(d3MM),
+            user1,
+            address(token2),
+            address(token3),
+            1 ether,
+            0,
+            abi.encode(swapData),
+            block.timestamp + 1000
+        );
+        uint256 gasleft2 = gasleft();
+        console.log("sellToken1stTime gas\t", gasleft1 - gasleft2);
+
+        uint256 afterBalance2 = token2.balanceOf(user1);
+        uint256 afterBalance3 = token3.balanceOf(user1);
+
+        //console.log(receiveToToken);
+        assertEq(beforeBalance2 - afterBalance2, 1 ether);
+        assertEq(afterBalance3 - beforeBalance3, receiveToToken);
+        assertEq(afterBalance3 - beforeBalance3, 11984294018423130017);
+    }
+
     function testNormalBuyTokens() public {
         uint256 beforeBalance2 = token2.balanceOf(user1);
         uint256 beforeBalance3 = token3.balanceOf(user1);
@@ -116,6 +159,51 @@ contract D3TradingTest is TestContext {
 
         assertEq(beforeBalance2 - afterBalance2, receiveToToken);
         assertEq(beforeBalance2 - afterBalance2, 83468096707748715); // 0.08
+        assertEq(afterBalance3 - beforeBalance3, 1 ether);
+    }
+
+    function testNormalBuyTokens_LpFeeRateZero() public {
+        ( , ,address poolMaker, , ) = d3MM.getD3MMInfo();
+        d3MakerWithPool = D3Maker(poolMaker);
+        vm.startPrank(maker);
+
+        address[] memory tokenList = new address[](1);
+        tokenList[0] = address(token2);
+        uint80[] memory priceList = new uint80[](1);
+        priceList[0] = stickPrice(12, 18, 0, 23, 15);
+        d3MakerWithPool.setTokensPrice(tokenList, priceList);
+        vm.stopPrank();
+
+        uint256 beforeBalance2 = token2.balanceOf(user1);
+        uint256 beforeBalance3 = token3.balanceOf(user1);
+
+        SwapCallbackData memory swapData;
+        swapData.data = "";
+        swapData.payer = user1;
+
+        uint256 gasleft1 = gasleft();
+        vm.prank(user1);
+        uint256 receiveToToken = d3Proxy.buyTokens(
+            address(d3MM),
+            user1,
+            address(token2),
+            address(token3),
+            1 ether,
+            30 ether,
+            abi.encode(swapData),
+            block.timestamp + 1000
+        );
+        uint256 gasleft2 = gasleft();
+        console.log("buyToken1stTime gas\t", gasleft1 - gasleft2);
+
+        uint256 afterBalance2 = token2.balanceOf(user1);
+        uint256 afterBalance3 = token3.balanceOf(user1);
+
+        //console.log(beforeBalance2 - afterBalance2);
+        //console.log(afterBalance3 - beforeBalance3);
+
+        assertEq(beforeBalance2 - afterBalance2, receiveToToken);
+        assertEq(beforeBalance2 - afterBalance2, 83418837585988938); // 0.08
         assertEq(afterBalance3 - beforeBalance3, 1 ether);
     }
 
