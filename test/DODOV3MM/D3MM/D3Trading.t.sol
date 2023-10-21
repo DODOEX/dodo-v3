@@ -969,15 +969,25 @@ contract D3TradingTest is TestContext {
         Types.TokenMMInfo memory tokenMMInfo;
         uint256 tokenIndex;
         (tokenMMInfo, tokenIndex) = d3MakerWithPool.getTokenMMInfoForPool(address(token3));
-        console.log(tokenMMInfo.askUpPrice);
-        console.log(tokenMMInfo.askDownPrice);
-        console.log(tokenMMInfo.bidUpPrice);
-        console.log(tokenMMInfo.bidDownPrice);
+        assertEq(tokenMMInfo.askUpPrice, 1000200000000000000);
+        assertEq(tokenMMInfo.askDownPrice, 1000100000000000000);
+        assertEq(tokenMMInfo.bidUpPrice, 1000200040008001601);
+        assertEq(tokenMMInfo.bidDownPrice, 1000100010001000101);
 
         console.log("query");
         (uint256 fromAmount, uint256 toAmount, uint256 vusd, ,) = d3MM.querySellTokens(address(token2), address(token3), 10000);
-        console.log(fromAmount);
-        console.log(toAmount);
-        console.log(vusd);
+        assertEq(toAmount, 2118866);
+        assertEq(vusd, 2119077);
+
+        // test lp fee =0
+        prices[0] = stickPrice(10000, 14, 0, 2, 2);
+        prices[1] = stickPrice(21195, 16, 0, 100, 100);
+        vm.startPrank(maker);
+        d3MakerWithPool.setTokensPrice(tokens, prices);
+        vm.stopPrank();
+
+        (fromAmount, toAmount, vusd, ,) = d3MM.querySellTokens(address(token2), address(token3), 10000);
+        assertEq(toAmount, 2119501);
+        assertEq(vusd, 2119501);
     }
 }
