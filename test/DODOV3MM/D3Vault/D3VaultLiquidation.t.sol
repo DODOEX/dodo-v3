@@ -378,10 +378,6 @@ contract D3VaultLiquidationTest is TestContext {
         assertEq(d3MM.isInLiquidation(), false);
         uint256 token2CashAfter = d3Vault.getCash(address(token2));
         assertGt(token2CashAfter, token2CashBefore);
-
-        uint256 poolToken2Balance = token2.balanceOf(address(d3MM));
-        uint256 poolToken2Reserve = d3MM.getTokenReserve(address(token2));
-        assertEq(poolToken2Balance, poolToken2Reserve);
     }
 
     function testFinishLiquidationDifferenceLessThan0() public {

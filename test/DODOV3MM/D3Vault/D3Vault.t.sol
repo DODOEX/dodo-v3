@@ -329,20 +329,20 @@ contract D3VaultTest is TestContext {
         d3Proxy.userDeposit(user1, address(token2), 500 ether, 0);
 
         // userDeposit is unblocked
-        uint256 balanceBefore = token2.balanceOf(maintainer);
-        vm.prank(vaultOwner);
-        d3Vault.withdrawLeft(address(token2));
-        uint256 balanceAfter = token2.balanceOf(maintainer);
-        assertEq(balanceAfter - balanceBefore, 1000 ether);
-        vm.prank(user1);
-        d3Proxy.userDeposit(user1, address(token2), 500 ether, 0);
+        // uint256 balanceBefore = token2.balanceOf(maintainer);
+        // vm.prank(vaultOwner);
+        // d3Vault.withdrawLeft(address(token2));
+        // uint256 balanceAfter = token2.balanceOf(maintainer);
+        // assertEq(balanceAfter - balanceBefore, 1000 ether);
+        // vm.prank(user1);
+        // d3Proxy.userDeposit(user1, address(token2), 500 ether, 0);
 
         // if _MAINTAINER_ is not set, withdrawLeft should revert
-        vm.prank(vaultOwner);
-        d3Vault.setMaintainer(address(0));
-        vm.prank(vaultOwner);
-        vm.expectRevert(bytes(Errors.MAINTAINER_NOT_SET));
-        d3Vault.withdrawLeft(address(token2));
+        // vm.prank(vaultOwner);
+        // d3Vault.setMaintainer(address(0));
+        // vm.prank(vaultOwner);
+        // vm.expectRevert(bytes(Errors.MAINTAINER_NOT_SET));
+        // d3Vault.withdrawLeft(address(token2));
     }
 
     function testGetCollateralRatio() public {

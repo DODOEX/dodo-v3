@@ -35,7 +35,7 @@ contract D3MMTest is TestContext {
     }
 
     function testFeeRate() public {
-        uint256 feeRate = d3MM.getFeeRate();
+        uint256 feeRate = d3MM.getFeeRate(address(token1));
         assertEq(feeRate, 2* 1e14); //0.02%
     }
 
@@ -57,6 +57,11 @@ contract D3MMTest is TestContext {
     function testVersion() public {
         string memory ver = d3MM.version();
         assertEq(ver, "D3MM 1.0.0");
+    }
+
+    function testGetTokenList() public {
+        address[] memory tokenlist = d3MM.getPoolTokenlist();
+        assertEq(tokenlist.length, 4);
     }
 
     function testSetNewMaker() public {

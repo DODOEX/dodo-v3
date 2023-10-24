@@ -14,6 +14,10 @@ library Types {
         address _MAINTAINER_;
         // token balance
         mapping(address => uint256) balances;
+        // the tokens have been deposited into pool
+        address[] depositedTokenList;
+        // record if a token has been deposited before
+        mapping(address => bool) hasDepositedToken;
     }
 
     struct TokenCumulative {

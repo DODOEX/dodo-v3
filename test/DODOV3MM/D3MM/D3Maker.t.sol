@@ -62,7 +62,7 @@ contract MakerTest is TestContext {
         uint256 tokenIndex;
 
         // token1 check
-        tokenIndex = d3Maker.getOneTokenOriginIndex(address(token1));
+        tokenIndex = uint256(d3Maker.getOneTokenOriginIndex(address(token1)));
         assertEq(tokenIndex, 0);
         uint256 priceInfo = d3Maker.getOneTokenPriceSet(address(token1));
         assertEq(priceInfo, token1Info.priceInfo);
@@ -76,7 +76,7 @@ contract MakerTest is TestContext {
         assertEq(tokenMMInfo.bidAmount, 30 * (10 ** 18));
 
         //token4 check
-        tokenIndex = d3Maker.getOneTokenOriginIndex(address(token4));
+        tokenIndex = uint256(d3Maker.getOneTokenOriginIndex(address(token4)));
         assertEq(tokenIndex, 3);
         priceInfo = d3Maker.getOneTokenPriceSet(address(token4));
         assertEq(priceInfo, token1Info.priceInfo);
@@ -106,8 +106,8 @@ contract MakerTest is TestContext {
         vm.expectRevert(bytes("D3MAKER_INVALID_TOKEN"));
         d3Maker.getOneTokenPriceSet(address(token1));
 
-        vm.expectRevert(bytes("D3MAKER_INVALID_TOKEN"));
-        d3Maker.getOneTokenOriginIndex(address(token1));
+        int256 index = d3Maker.getOneTokenOriginIndex(address(token1));
+        assertEq(index, -1);
     }
 
     function testSetTokenPrice() public {

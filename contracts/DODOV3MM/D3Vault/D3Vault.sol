@@ -71,62 +71,77 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
 
     function setCloneFactory(address cloneFactory) external onlyOwner {
         _CLONE_FACTORY_ = cloneFactory;
+        emit SetCloneFactory(cloneFactory);
     }
 
     function setNewD3Factory(address newFactory) external onlyOwner {
         _D3_FACTORY_ = newFactory;
+        emit SetD3Factory(newFactory);
     }
 
     function setNewD3UserQuota(address newQuota) external onlyOwner {
         _USER_QUOTA_ = newQuota;
+        emit SetD3UserQuota(newQuota);
     }
 
     function setNewD3PoolQuota(address newQuota) external onlyOwner {
         _POOL_QUOTA_ = newQuota;
+        emit SetD3PoolQuota(newQuota);
     }
 
     function setNewOracle(address newOracle) external onlyOwner {
         _ORACLE_ = newOracle;
+        emit SetOracle(newOracle);
     }
 
     function setNewRateManager(address newRateManager) external onlyOwner {
         _RATE_MANAGER_ = newRateManager;
+        emit SetRateManager(newRateManager);
     }
 
     function setMaintainer(address maintainer) external onlyOwner {
         _MAINTAINER_ = maintainer;
+        emit SetMaintainer(maintainer);
     }
 
     function setIM(uint256 newIM) external onlyOwner {
         IM = newIM;
+        emit SetIM(newIM);
     }
 
     function setMM(uint256 newMM) external onlyOwner {
         MM = newMM;
+        emit SetMM(newMM);
     }
 
     function setDiscount(uint256 discount) external onlyOwner {
         DISCOUNT = discount;
+        emit SetDiscount(discount);
     }
 
     function setDTokenTemplate(address dTokenTemplate) external onlyOwner {
         _D3TOKEN_LOGIC_ = dTokenTemplate;
+        emit SetDTokenTemplate(dTokenTemplate);
     }
 
     function addRouter(address router) external onlyOwner {
         allowedRouter[router] = true;
+        emit AddRouter(router);
     }
 
     function removeRouter(address router) external onlyOwner {
         allowedRouter[router] = false;
+        emit RemoveRouter(router);
     }
 
     function addLiquidator(address liquidator) external onlyOwner {
         allowedLiquidator[liquidator] = true;
+        emit AddLiquidator(liquidator);
     }
 
     function removeLiquidator(address liquidator) external onlyOwner {
         allowedLiquidator[liquidator] = false;
+        emit RemoveLiquidator(liquidator);
     }
 
     function addNewToken(
@@ -152,6 +167,7 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
         info.maxCollateralAmount = maxCollateral;
         info.collateralWeight = collateralWeight;
         info.debtWeight = debtWeight;
+        emit AddToken(token);
     }
 
     function createDToken(address token) internal returns (address) {
@@ -177,6 +193,7 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
         info.collateralWeight = collateralWeight;
         info.debtWeight = debtWeight;
         info.reserveFactor = reserveFactor;
+        emit SetToken(token);
     }
 
     function withdrawReserves(address token, uint256 amount) external nonReentrant allowedToken(token) onlyOwner {
@@ -189,18 +206,19 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
         info.withdrawnReserves = info.withdrawnReserves + amount;
         info.balance = info.balance - amount;
         IERC20(token).safeTransfer(_MAINTAINER_, amount);
+        emit WithdrawReserves(token, amount);
     }
 
     /// @notice If someone directly transfer large amounts of a token into vault, may block the userDeposit() function
     /// @notice Owner can use this function to transfer out the token to unblock deposition.
-    function withdrawLeft(address token) external nonReentrant allowedToken(token) onlyOwner {
-        require(_MAINTAINER_ != address(0), Errors.MAINTAINER_NOT_SET);
-        AssetInfo storage info = assetInfo[token];
-        uint256 balance = IERC20(token).balanceOf(address(this));
-        if (balance > info.balance) {
-            IERC20(token).safeTransfer(_MAINTAINER_, balance - info.balance);
-        }
-    }
+    // function withdrawLeft(address token) external nonReentrant allowedToken(token) onlyOwner {
+    //     require(_MAINTAINER_ != address(0), Errors.MAINTAINER_NOT_SET);
+    //     AssetInfo storage info = assetInfo[token];
+    //     uint256 balance = IERC20(token).balanceOf(address(this));
+    //     if (balance > info.balance) {
+    //         IERC20(token).safeTransfer(_MAINTAINER_, balance - info.balance);
+    //     }
+    // }
 
     // ---------- View ----------
 

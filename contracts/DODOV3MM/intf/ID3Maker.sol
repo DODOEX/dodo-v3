@@ -16,5 +16,6 @@ interface ID3Maker {
         view
         returns (Types.TokenMMInfo memory tokenMMInfo, uint256 tokenIndex);
     function checkHeartbeat() external view returns (bool);
-    function getOneTokenOriginIndex(address token) external view returns (uint256);
+    function getOneTokenOriginIndex(address token) external view returns (int256);
+    function getPoolTokenListFromMaker() external view returns(address[] memory tokenlist);
 }

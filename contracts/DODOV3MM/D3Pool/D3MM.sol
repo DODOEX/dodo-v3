@@ -3,6 +3,7 @@ pragma solidity 0.8.16;
 
 import {D3Trading} from "./D3Trading.sol";
 import {IFeeRateModel} from "../../intf/IFeeRateModel.sol";
+import {ID3Maker} from "../intf/ID3Maker.sol";
 
 contract D3MM is D3Trading {
     /// @notice init D3MM pool
@@ -34,8 +35,16 @@ contract D3MM is D3Trading {
         return state._CREATOR_;
     }
 
-    function getFeeRate() external view returns(uint256 feeRate) {
-        return IFeeRateModel(state._FEE_RATE_MODEL_).getFeeRate();
+    function getFeeRate(address token) external view returns(uint256 feeRate) {
+        return IFeeRateModel(state._FEE_RATE_MODEL_).getFeeRate(token);
+    }
+
+    function getPoolTokenlist() external view returns(address[] memory) {
+        return ID3Maker(state._MAKER_).getPoolTokenListFromMaker();
+    }
+
+    function getDepositedTokenList() external view returns (address[] memory) {
+        return state.depositedTokenList;
     }
 
     /// @notice get basic pool info

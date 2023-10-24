@@ -9,7 +9,7 @@ pragma solidity 0.8.16;
 
 interface ID3MM {
     function _CREATOR_() external view returns(address);
-    function getFeeRate() external view returns(uint256);
+    function getFeeRate(address) external view returns(uint256);
     function allFlag() external view returns(uint256);
     function checkSafe() external view returns (bool);
     function checkBorrowSafe() external view returns (bool);

@@ -28,6 +28,10 @@ contract D3FundingTest is TestContext {
     }
 
     function testBorrowAndMakerDeposit() public {
+        address[] memory depositedTokenList;
+        depositedTokenList = d3MM.getDepositedTokenList();
+        assertEq(depositedTokenList.length, 0);
+
         // check not borrow safe
         vm.prank(poolCreator);
         vm.expectRevert(bytes(PoolErrors.NOT_SAFE));
@@ -39,18 +43,27 @@ contract D3FundingTest is TestContext {
         vm.expectRevert(bytes(PoolErrors.NOT_BORROW_SAFE));
         d3MM.borrow(address(token1), 100 * 1e8);
         vm.stopPrank();
+        depositedTokenList = d3MM.getDepositedTokenList();
+        assertEq(depositedTokenList.length, 1);
+        assertEq(depositedTokenList[0], address(token1));
 
         // maker deposit and borrow
         vm.startPrank(poolCreator);
         d3Proxy.makerDeposit(address(d3MM), address(token1), 100 * 1e8);
         d3MM.borrow(address(token1), 100 * 1e8);
         vm.stopPrank();
+        depositedTokenList = d3MM.getDepositedTokenList();
+        assertEq(depositedTokenList.length, 1);
+        assertEq(depositedTokenList[0], address(token1));
 
         // deposit invalid token
         uint256 beforeRatio = d3Vault.getCollateralRatio(address(d3MM));
         tokenEx.mint(address(d3MM), 100 * 1e18);
         vm.expectRevert(bytes("D3MM_TOKEN_NOT_FEASIBLE"));
         d3MM.makerDeposit(address(tokenEx));
+        depositedTokenList = d3MM.getDepositedTokenList();
+        assertEq(depositedTokenList.length, 1);
+        assertEq(depositedTokenList[0], address(token1));
 
         oracle.setPriceSource(
             address(tokenEx), PriceSource(address(tokenExChainLinkOracle), true, 5 * (10 ** 17), 18, 18, 3600)
@@ -60,6 +73,9 @@ contract D3FundingTest is TestContext {
         uint256 approveAmount = tokenEx.allowance(address(d3Vault),address(d3MM));
         assertEq(approveAmount, 0);
         assertEq(afterRatio, beforeRatio);
+        depositedTokenList = d3MM.getDepositedTokenList();
+        assertEq(depositedTokenList.length, 2);
+        assertEq(depositedTokenList[1], address(tokenEx));
 
         oracle.setTokenOracleFeasible(address(tokenEx), false);
         tokenEx.mint(address(d3MM), 100 * 1e18);
