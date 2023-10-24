@@ -52,7 +52,7 @@ contract D3Maker is InitializableOwnable {
             tokenMMInfo.bidUpPrice,
             tokenMMInfo.bidDownPrice,
             tokenMMInfo.swapFeeRate
-        ) = MakerTypes.parseAllPrice(priceInfo, mtFeeRate);
+        ) = MakerTypes.parseAllPrice(priceInfo);
         // lpfee add mtFee
         tokenMMInfo.mtFeeRate = mtFeeRate;
         uint64 amountInfo = state.tokenMMInfoMap[token].amountInfo;

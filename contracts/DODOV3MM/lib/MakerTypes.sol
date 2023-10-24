@@ -63,7 +63,7 @@ library MakerTypes {
         amountWithDecimal = bidAmount * (10 ** bidAmountDecimal);
     }
 
-    function parseAllPrice(uint80 priceInfo, uint256 mtFeeRate)
+    function parseAllPrice(uint80 priceInfo)
         internal
         pure
         returns (uint256 askUpPrice, uint256 askDownPrice, uint256 bidUpPrice, uint256 bidDownPrice, uint256 swapFee)
@@ -78,7 +78,7 @@ library MakerTypes {
         uint256 bidDownRate = priceInfo & 0xffff;
 
         // swap fee rate standarlize
-        swapFee = swapFeeRate * (10 ** 14) + mtFeeRate;
+        swapFee = swapFeeRate * (10 ** 14);
         uint256 swapFeeSpread = DecimalMath.mul(midPriceWithDecimal, swapFee);
 
         // ask price standarlize

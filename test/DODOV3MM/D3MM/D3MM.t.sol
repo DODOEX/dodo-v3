@@ -94,10 +94,10 @@ contract D3MMTest is TestContext {
         //console.log(receiveToToken);
         assertEq(beforeBalance2 - afterBalance2, 1 ether);
         assertEq(afterBalance3 - beforeBalance3, receiveToToken);
-        assertEq(afterBalance3 - beforeBalance3, 11959881980233813532); // 11.9, suppose 12
+        assertEq(afterBalance3 - beforeBalance3, 11978524479259449453); // 11.9, suppose 12
         (,,,,uint256 cumulativeAsk, uint256 cumulativeBid) = d3MM.getTokenMMOtherInfoForRead(address(token2));
         assertEq(cumulativeAsk, 0);
-        assertEq(cumulativeBid, 11988727083375218064);
+        assertEq(cumulativeBid, 11990650771415848322);
 
         uint256 allFlag = d3MM.allFlag();
         assertEq(allFlag, 20);
@@ -126,6 +126,6 @@ contract D3MMTest is TestContext {
 
         // check price
         (,uint256 receiveAmount , , ,) = d3MM.querySellTokens(address(token2), address(token3), 1 ether);
-        assertEq(receiveAmount, 996640179180765387); // 0.99, suppose 1
+        assertEq(receiveAmount, 998194397280843196); // 0.99, suppose 1
     }
  }

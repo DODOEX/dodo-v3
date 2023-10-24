@@ -142,15 +142,15 @@ contract PMMRangeOrderTest is TestContext {
 
         (uint256 fromAmount, uint256 receiveToToken, uint256 vusdAmount) = pmmRangeOrderHelper.querySellTokens(roState, address(token1), address(token2), 10 ** 18);
         assertEq(fromAmount, 10**18);
-        assertEq(receiveToToken, 24964525068078312916); // 24.96, because max vusdAmount = 300, suppose 25
+        assertEq(receiveToToken, 24967456577251163707); // 24.96, because max vusdAmount = 300, suppose 25
         assertEq(vusdAmount, 300 * (10** 18));
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.querySellTokens(roState, address(token1), address(token2), 10 ** 17);
         assertEq(fromAmount, 10**17);
         //console.log(receiveToToken);
         //console.log(vusdAmount);
-        assertEq(receiveToToken, 10812649799795029422); // 10.81, suppose near 10.83
-        assertEq(vusdAmount, 129890376538907193976); // 129.8, suppose near 130
+        assertEq(receiveToToken, 10816124163234959962); // 10.81, suppose near 10.83
+        assertEq(vusdAmount, 129910761528419159777); // 129.8, suppose near 130
 
         // with cumulative
         roState.fromTokenMMInfo.cumulativeAsk = 4 * (10 ** 18);
@@ -159,13 +159,13 @@ contract PMMRangeOrderTest is TestContext {
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.querySellTokens(roState, address(token1), address(token2), 10 ** 18);
         assertEq(fromAmount, 10**18);
-        assertEq(receiveToToken, 21633407960311327528); // 21.63, because max vusdAmount = 260, suppose near 21.67
+        assertEq(receiveToToken, 21635614416486451483); // 21.63, because max vusdAmount = 260, suppose near 21.67
         assertEq(vusdAmount, 260 * (10** 18));
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.querySellTokens(roState, address(token1), address(token2), 10 ** 17);
         assertEq(fromAmount, 10**17);
-        assertEq(receiveToToken, 10810214517700684559); // 10.81, suppose near 10.83 < 10812
-        assertEq(vusdAmount, 129886911976839434749); // 129.8, suppose near 130, < 12989
+        assertEq(receiveToToken, 10813115431872979233); // 10.81, suppose near 10.83 < 10812
+        assertEq(vusdAmount, 129903836603817301717); // 129.8, suppose near 130, < 12989
 
         // change fromToken and toToken, fromToken = 12, toToken = 1300
         Types.TokenMMInfo memory tokenMMInfo = roState.toTokenMMInfo;
@@ -174,13 +174,13 @@ contract PMMRangeOrderTest is TestContext {
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.querySellTokens(roState, address(token2), address(token1), (100)*10 ** 18);
         assertEq(fromAmount, (100)*10 ** 18);
-        assertEq(receiveToToken, 19982947988629054); // 0.019, suppose near 0.02
+        assertEq(receiveToToken, 19986411463079296); // 0.019, suppose near 0.02
         assertEq(vusdAmount, 26 * (10** 18)); // suppose 1200, max vusdAmount = 26
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.querySellTokens(roState, address(token2), address(token1), 10 ** 18);
         assertEq(fromAmount, 10 ** 18);
-        assertEq(receiveToToken, 9213376791555881); // 0.0092, suppose near 0.00923
-        assertEq(vusdAmount, 11987609614474078065); // 11.9, suppose 12, 
+        assertEq(receiveToToken, 9216208031790700); // 0.0092, suppose near 0.00923
+        assertEq(vusdAmount, 11989214950558305806); // 11.9, suppose 12, 
     }
 
     function testQueryBuyTokens() public {
@@ -188,9 +188,9 @@ contract PMMRangeOrderTest is TestContext {
         // fromToken is 1300, toToken is 12
 
         (uint256 fromAmount, uint256 receiveToToken, uint256 vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 24964525068078312916);
-        assertEq(fromAmount, 230977100923055001); // 0.2309, suppose near(>) 0.2304
+        assertEq(fromAmount, 230926815372467868); // 0.2309, suppose near(>) 0.2304
         assertEq(receiveToToken, 24964525068078312916); // 24.96
-        assertEq(vusdAmount, 299999999999999998460); // 299.99, suppose near 300
+        assertEq(vusdAmount, 299964751121110757874); // 299.99, suppose near 300
         //console.log(fromAmount);
         //console.log(vusdAmount);
 
@@ -199,9 +199,9 @@ contract PMMRangeOrderTest is TestContext {
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2),40 * (10 ** 18));
         
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokensLoc(roState, address(token1), address(token2), 10812725271096067414);
-        assertEq(fromAmount, 100000698208426075); // suppose nead 1e18
+        assertEq(fromAmount, 99968563416391785); // suppose nead 1e18
         assertEq(receiveToToken, 10812725271096067414); // 0.01
-        assertEq(vusdAmount, 129891283405183499173); // 12.9, suppose near 129891283405183499858
+        assertEq(vusdAmount, 129869925557578937327); // 12.9, suppose near 129891283405183499858
 
         // with cumulative
         roState.fromTokenMMInfo.cumulativeAsk = 4 * (10 ** 18);
@@ -209,14 +209,14 @@ contract PMMRangeOrderTest is TestContext {
         roState.toTokenMMInfo.cumulativeBid = roState.toTokenMMInfo.cumulativeAsk = 4 * (10 ** 18);
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 21633407960311327528);
-        assertEq(fromAmount, 200182824626646523); // suppose near(>) 0.02
+        assertEq(fromAmount, 200145004590210191); // suppose near(>) 0.02
         assertEq(receiveToToken, 21633407960311327528); // 21.63, because max vusdAmount = 260, suppose near 21.67
-        assertEq(vusdAmount, 259999999999999954026); // suppose 260
+        assertEq(vusdAmount, 259973468248643989292); // suppose 260
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 10810278971047276557);
-        assertEq(fromAmount, 100000596412654143); // suppose 1e18
+        assertEq(fromAmount, 99973758057015627); // suppose 1e18
         assertEq(receiveToToken, 10810278971047276557); // 10.81, suppose near 10.83 < 10812
-        assertEq(vusdAmount, 129887686605257200476); // suppose 129887686605257245795,  129.8
+        assertEq(vusdAmount, 129869750265425736303); // suppose 129887686605257245795,  129.8
 
         // change fromToken and toToken, fromToken = 12, toToken = 1300
         Types.TokenMMInfo memory tokenMMInfo = roState.toTokenMMInfo;
@@ -224,14 +224,14 @@ contract PMMRangeOrderTest is TestContext {
         roState.fromTokenMMInfo = tokenMMInfo;
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token2), address(token1), 19982947988629054);
-        assertEq(fromAmount, 2169261355031671770); //21.6, suppose near(>) 21.6
+        assertEq(fromAmount, 2168696336180917380); //21.6, suppose near(>) 21.6
         assertEq(receiveToToken, 19982947988629054); // 0.019, suppose near 0.02
-        assertEq(vusdAmount, 25999999999989768292); //suppose near 26 * (10** 18)), max vusdAmount = 26
+        assertEq(vusdAmount, 25995494421095758256); //suppose near 26 * (10** 18)), max vusdAmount = 26
 
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token2), address(token1), 9213376791555881);
-        assertEq(fromAmount, 999999999999146822); // suppose 1e18
+        assertEq(fromAmount, 999692742457309249); // suppose 1e18
         assertEq(receiveToToken, 9213376791555881); // 0.0092, suppose near 0.00923
-        assertEq(vusdAmount, 11987609614463856804); // suppose 11987609614474078065,  11.9
+        assertEq(vusdAmount, 11985531835891652912); // suppose 11987609614474078065,  11.9
     }
 
     function testKisZero() public {
@@ -239,17 +239,17 @@ contract PMMRangeOrderTest is TestContext {
         // fromToken is 1300, toToken is 12
         
         (uint256 fromAmount, uint256 receiveToToken, uint256 vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 1e19);
-        assertEq(fromAmount, 92482101050675776); 
+        assertEq(fromAmount, 92451834441199885); 
         assertEq(receiveToToken, 1e19); // 10
-        assertEq(vusdAmount, 120125740394024407940);
+        assertEq(vusdAmount, 120105666938664261055);
         //console.log(fromAmount);
         //console.log(vusdAmount);
 
         roState.fromTokenMMInfo.kBid = 0;
         (fromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 1e19);
-        assertEq(fromAmount, 92478398406436275); 
+        assertEq(fromAmount, 92444441232943138); 
         assertEq(receiveToToken, 1e19); // 10
-        assertEq(vusdAmount, 120125740394024407940);
+        assertEq(vusdAmount, 120105666938664261055);
     }
 
     function testPriceIsZero() public {
