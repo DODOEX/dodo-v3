@@ -941,7 +941,7 @@ contract D3TradingTest is TestContext {
 
     function testExtraFee() public {
         vm.prank(owner);
-        feeRateModel.setFeeRate(0);
+        feeRateModel.setDefaultFeeRate(0);
 
         token2ChainLinkOracle.feedData(212 * 1e18);
         token3ChainLinkOracle.feedData(1 * 1e18);
