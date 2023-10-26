@@ -91,6 +91,11 @@ const config: HardhatUserConfig = {
       chainId: 56,
       deploy: ["./deploy/bsc/"],
     },
+    avax: {
+      url: TRUFFLE_DASHBOARD_RPC,
+      chainId: 43114,
+      deploy: ["./deploy/avax/"],
+    },
   },
   namedAccounts: {
     deployer: {
@@ -124,6 +129,7 @@ const config: HardhatUserConfig = {
       kcc: process.env.KCC_API_KEY ?? '',
       arbitrumOne: process.env.ARBITRUM_API_KEY ?? '',
       polygon: process.env.POLYGON_API_KEY ?? '',
+      avalanche: process.env.SNOWTRACE_API_KEY ?? '',
     },
     customChains: [
       {
