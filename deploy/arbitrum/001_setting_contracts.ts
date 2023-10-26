@@ -13,7 +13,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await main();
 
   async function main() {
-    await setD3Vault(true)
+    // await setD3Vault(true)
   }
 
   async function setD3Vault(shouldSet: boolean) {
