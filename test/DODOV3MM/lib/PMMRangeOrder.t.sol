@@ -136,6 +136,62 @@ contract PMMRangeOrderTest is TestContext {
         roState.toTokenMMInfo.cumulativeAsk = roState.toTokenMMInfo.cumulativeBid = 0;
     }
 
+    function testBuyExceed() public {
+
+        token2ChainLinkOracle.feedData(1 * 1e18);
+        token1ChainLinkOracle.feedData(14 * 1e18);
+
+        address[] memory tokens = new address[](2);
+        uint64[] memory amounts = new uint64[](2);
+        uint80[] memory prices = new uint80[](2);
+        uint32[] memory ks = new uint32[](2);
+
+        tokens[0] = address(token1); 
+        tokens[1] = address(token2); 
+        amounts[0] = stickAmount(300, 18, 10, 18); //small bid
+        amounts[1] = stickAmount(300, 18, 300, 18);
+        prices[0] = stickPrice(14, 18, 100, 200, 200);
+        prices[1] = stickPrice(1, 18, 100, 200, 200);
+        ks[0] = stickKs(100, 100);
+        ks[1] = stickKs(100, 100);
+
+        vm.startPrank(owner);
+        d3Maker.setTokensAmounts(tokens, amounts);
+        d3Maker.setTokensKs(tokens, ks);
+        d3Maker.setTokensPrice(tokens, prices);
+        vm.stopPrank();
+
+        Types.RangeOrderState memory roState = get12RangeOrder();
+        roState.fromTokenMMInfo.cumulativeAsk = roState.fromTokenMMInfo.cumulativeBid = 5;
+        roState.toTokenMMInfo.cumulativeAsk = roState.toTokenMMInfo.cumulativeBid = 100;
+
+        // without cutting 1, loc code
+        // payVUSD = 202486486317288494776, b0 = 33729824119492690333, Bleft = 9999999999999999995
+        vm.expectRevert(bytes("DODOstate.BNOT_ENOUGH"));
+        (uint256 payFromAmount, uint256 receiveToToken, uint256 vusdAmount) = pmmRangeOrderHelper.queryBuyTokensLoc(roState, address(token1), address(token2), 200 * 1e18);
+
+        // cutting, formal code
+        vm.expectRevert(bytes("PMMRO_BIDAMOUNT_NOT_ENOUGH"));
+        (payFromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 200 * 1e18);
+    
+        // contruct over
+        amounts[0] = stickAmount(300, 18, 100, 18); //normal bid
+        amounts[1] = stickAmount(3000, 18, 300, 18);
+        vm.prank(owner);
+        d3Maker.setTokensAmounts(tokens, amounts);
+        roState = get12RangeOrder();
+        roState.fromTokenMMInfo.cumulativeAsk = roState.fromTokenMMInfo.cumulativeBid = 80*1e18;
+        roState.toTokenMMInfo.cumulativeAsk = roState.toTokenMMInfo.cumulativeBid = 100;
+
+        // without cutting 1, loc code
+        (payFromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokensLoc(roState, address(token1), address(token2), 200 * 1e18);
+        assertEq(vusdAmount, 202039982394553405980);
+    
+        // cutting, formal code
+        vm.expectRevert(bytes("PMMRO_BIDAMOUNT_NOT_ENOUGH"));
+        (payFromAmount, receiveToToken, vusdAmount) = pmmRangeOrderHelper.queryBuyTokens(roState, address(token1), address(token2), 200 * 1e18);
+    }
+
     function testQuerySellTokens() public {
         Types.RangeOrderState memory roState = get12RangeOrder();
         // fromToken is 1300, toToken is 12

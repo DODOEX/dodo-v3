@@ -61,6 +61,7 @@ library PMMRangeOrder {
         // construct vUSD to toToken
         {
             PMMPricing.PMMState memory fromTokenState = _contructTokenState(roState, true, false);
+            require(payVUSD <= fromTokenState.BLeft, Errors.RO_BID_AMOUNT);
             payFromToken = PMMPricing._queryBuyBaseToken(fromTokenState, payVUSD);
         }
 

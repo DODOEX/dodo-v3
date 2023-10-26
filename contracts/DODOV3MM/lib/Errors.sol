@@ -35,6 +35,7 @@ library Errors {
     string public constant RO_AMOUNT_ZERO = "PMMRO_AMOUNT_ZERO";
     string public constant RO_PRICE_ZERO = "PMMRO_PRICE_ZERO";
     string public constant RO_PRICE_DIFF_TOO_SMALL = "PMMRO_PRICE_DIFF_TOO_SMALL";
+    string public constant RO_BID_AMOUNT = "PMMRO_BIDAMOUNT_NOT_ENOUGH";
 
     
 }
