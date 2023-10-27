@@ -14,7 +14,7 @@ contract MockD3Pool {
         allFlag = newFlag;
     }
 
-    function getFeeRate(address token) public pure returns(uint256){
+    function getFeeRate(address) public pure returns(uint256){
         return 2 * (10 ** 14);
     }
 
