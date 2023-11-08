@@ -13,7 +13,7 @@ contract D3Funding is D3Storage {
     using SafeERC20 for IERC20;
 
     /// @notice borrow tokens from vault
-    function borrow(address token, uint256 amount) external onlyOwner nonReentrant poolOngoing {
+    function borrow(address token, uint256 amount) external virtual onlyOwner nonReentrant poolOngoing {
         // call vault's poolBorrow function
         ID3Vault(state._D3_VAULT_).poolBorrow(token, amount);
         // approve max, ensure vault could force liquidate
@@ -28,7 +28,7 @@ contract D3Funding is D3Storage {
     }
 
     /// @notice repay vault with certain amount of borrowed assets 
-    function repay(address token, uint256 amount) external onlyOwner nonReentrant poolOngoing {
+    function repay(address token, uint256 amount) external virtual onlyOwner nonReentrant poolOngoing {
         // call vault's poolRepay
         ID3Vault(state._D3_VAULT_).poolRepay(token, amount);
 
@@ -37,7 +37,7 @@ contract D3Funding is D3Storage {
     }
 
     /// @notice repay vault all debt of this token
-    function repayAll(address token) external onlyOwner nonReentrant poolOngoing {
+    function repayAll(address token) external virtual onlyOwner nonReentrant poolOngoing {
         ID3Vault(state._D3_VAULT_).poolRepayAll(token);
 
         _updateReserve(token);

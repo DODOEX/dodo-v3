@@ -3,6 +3,7 @@ pragma solidity 0.8.16;
 
 import {InitializableOwnable} from "../lib/InitializableOwnable.sol";
 import {ID3Oracle} from "../../intf/ID3Oracle.sol";
+import {ID3MM} from "../intf/ID3MM.sol";
 import "../lib/DecimalMath.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
@@ -32,7 +33,7 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
 
     /// @notice Set sequencer feed address
     /// @notice For non-L2 network, should be address(0)
-    /// @notice For a list of available Sequencer Uptime Feed proxy addresses, 
+    /// @notice For a list of available Sequencer Uptime Feed proxy addresses,
     /// @notice see: https://docs.chain.link/docs/data-feeds/l2-sequencer-feeds
     function setSequencer(address addr) external onlyOwner {
         sequencerFeed = addr;
@@ -93,6 +94,12 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
     /// @dev PMMRangeOrder will parse token amount if the decimals is not 18
     /// @dev Do not use this function in other place. If use, make sure both tokens' decimals are 18
     function getMaxReceive(address fromToken, address toToken, uint256 fromAmount) external view returns (uint256) {
+        if (keccak256(abi.encodePacked(ID3MM(msg.sender).version())) == keccak256(abi.encodePacked("D3MM No Borrow"))) {
+            if (!priceSources[fromToken].isWhitelisted || !priceSources[toToken].isWhitelisted) {
+                return type(uint256).max;
+            }
+        }
+        
         uint256 fromTlr = priceSources[fromToken].priceTolerance;
         uint256 toTlr = priceSources[toToken].priceTolerance;
 
