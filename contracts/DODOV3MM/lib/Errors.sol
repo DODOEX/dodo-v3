@@ -23,6 +23,8 @@ library Errors {
     string public constant K_LIMIT = "D3MAKER_K_LIMIT_ERROR";
     string public constant PRICE_UP_BELOW_PRICE_DOWN = "D3MAKER_PRICE_UP_BELOW_PRICE_DOWN";
     string public constant HAVE_SET_TOKEN_INFO = "D3MAKER_HAVE_SET_TOKEN_INFO";
+    string public constant OLD_TOKEN_NOT_FOUND = "D3MAKER_OLD_TOKEN_NOT_FOUND";
+    string public constant STABLE_TYPE_NOT_MATCH = "D3MAKER_STABLE_TYPE_NOT_MATCH";
     string public constant K_LENGTH_NOT_MATCH = "D3MAKER_K_LENGTH_NOT_MATCH";
     string public constant AMOUNTS_LENGTH_NOT_MATCH = "D3MAKER_AMOUNTS_LENGTH_NOT_MATCH";
     string public constant PRICES_LENGTH_NOT_MATCH = "D3MAKER_PRICES_LENGTH_NOT_MATCH";

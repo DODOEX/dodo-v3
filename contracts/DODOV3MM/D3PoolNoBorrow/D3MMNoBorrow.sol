@@ -20,6 +20,6 @@ contract D3MMNoBorrow is D3MM {
 
     /// @notice get D3MM contract version
     function version() external pure virtual override returns (string memory) {
-        return "D3MM No Borrow";
+        return "D3MMNoBorrow 1.0.0";
     }
 }

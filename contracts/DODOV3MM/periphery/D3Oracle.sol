@@ -19,6 +19,7 @@ struct PriceSource {
 contract D3Oracle is ID3Oracle, InitializableOwnable {
     // originToken => priceSource
     mapping(address => PriceSource) public priceSources;
+    mapping(bytes32 => bool) public whitelistVersion;
     address public sequencerFeed;
 
     uint256 private constant GRACE_PERIOD_TIME = 3600;
@@ -53,6 +54,10 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
     /// @param isAvailable Whether the oracle is available for the token
     function setTokenOracleFeasible(address token, bool isAvailable) external onlyOwner {
         priceSources[token].isWhitelisted = isAvailable;
+    }
+
+    function setWhitelistVersion(bytes32 version, bool isAllowed) external onlyOwner {
+        whitelistVersion[version] = isAllowed;
     }
 
     /// @notice Get the price for a token
@@ -94,7 +99,8 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
     /// @dev PMMRangeOrder will parse token amount if the decimals is not 18
     /// @dev Do not use this function in other place. If use, make sure both tokens' decimals are 18
     function getMaxReceive(address fromToken, address toToken, uint256 fromAmount) external view returns (uint256) {
-        if (keccak256(abi.encodePacked(ID3MM(msg.sender).version())) == keccak256(abi.encodePacked("D3MM No Borrow"))) {
+        bytes32 version = keccak256(abi.encodePacked(ID3MM(msg.sender).version()));
+        if (whitelistVersion[version]) {
             if (!priceSources[fromToken].isWhitelisted || !priceSources[toToken].isWhitelisted) {
                 return type(uint256).max;
             }
