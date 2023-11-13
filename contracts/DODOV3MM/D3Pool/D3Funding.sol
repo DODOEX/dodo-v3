@@ -55,7 +55,7 @@ contract D3Funding is D3Storage {
     }
 
     /// @notice maker deposit, anyone could deposit but only maker could withdraw
-    function makerDeposit(address token) external nonReentrant poolOngoing {
+    function makerDeposit(address token) external virtual nonReentrant poolOngoing {
         require(ID3Oracle(state._ORACLE_).isFeasible(token), Errors.TOKEN_NOT_FEASIBLE);
         if (!state.hasDepositedToken[token]) {
             state.hasDepositedToken[token] = true;
