@@ -3,7 +3,7 @@ pragma solidity 0.8.16;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {D3MM} from "../D3Pool/D3MM.sol";
+import {D3MM} from "D3Pool/D3MM.sol";
 
 contract D3MMNoBorrow is D3MM {
     using SafeERC20 for IERC20;

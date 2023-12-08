@@ -3,7 +3,7 @@ pragma solidity 0.8.16;
 
 import "../lib/MakerTypes.sol";
 import "../lib/Errors.sol";
-import {D3Maker} from "../D3Pool/D3Maker.sol";
+import {D3Maker} from "D3Pool/D3Maker.sol";
 
 /// @notice D3MakerFreeSlot is a special type of D3Maker, in which the market maker can set a new token info in an exsiting token slot, which can save gas
 contract D3MakerFreeSlot is D3Maker {
