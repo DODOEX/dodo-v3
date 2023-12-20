@@ -10,10 +10,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await main();
+  // await main();
 
   async function main() {
-    // await setD3Vault(true)
+    await setD3Vault(true)
   }
 
   async function setD3Vault(shouldSet: boolean) {
@@ -78,6 +78,26 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         config.defaultAddress.USDTe,
         bignumberFromE(10000000e6),
         bignumberFromE(500000e6),
+        bignumberFromE(90e16),
+        bignumberFromE(110e16),
+        bignumberFromE(10e16)
+      )
+
+      console.log("addNewToken USDC...")
+      await D3Vault.addNewToken(
+        config.defaultAddress.USDC,
+        bignumberFromE(10000000e6),
+        bignumberFromE(500000e6),
+        bignumberFromE(90e16),
+        bignumberFromE(110e16),
+        bignumberFromE(10e16)
+      )
+
+      console.log("addNewToken WAVAX...")
+      await D3Vault.addNewToken(
+        config.defaultAddress.WAVAX,
+        bignumberFromE(100000e18),
+        bignumberFromE(50000e18),
         bignumberFromE(90e16),
         bignumberFromE(110e16),
         bignumberFromE(10e16)

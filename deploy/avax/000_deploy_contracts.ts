@@ -10,13 +10,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await main();
+  // await main();
 
   async function main() {
-    const d3MMTemplate = await deployContract("D3MMTemplate", "D3MM", []);
-    const d3MakerTemplate = await deployContract("D3MakerTemplate", "D3Maker", []);
-    console.log("new D3MM template:", d3MMTemplate)
-    console.log("new D3Maker template:", d3MakerTemplate)
     // await deployD3Oracle(true);
     // await deployD3RateManager(true);
     // await deployFeeRateModel(true);
@@ -69,38 +65,38 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     if (shouldSet) {
       const D3Oracle = await ethers.getContractAt("D3Oracle", oracleAddress);
 
-      // const priceSourceWBTC = {
-      //   oracle: config.chainlinkPriceFeed.WBTC_USD,
-      //   isWhitelisted: true,
-      //   priceTolerance: BigNumber.from(padZeros(9, 17)),
-      //   priceDecimal: 8,
-      //   tokenDecimal: 8,
-      //   heartBeat: 100000
-      // }
-      // console.log("setPriceSource for WBTC...")
-      // await D3Oracle.setPriceSource(config.defaultAddress.WBTC, priceSourceWBTC);
+      const priceSourceWBTC = {
+        oracle: config.chainlinkPriceFeed.WBTC_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 8,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for WBTC...")
+      await D3Oracle.setPriceSource(config.defaultAddress.WBTC, priceSourceWBTC);
 
-      // const priceSourceBTC = {
-      //   oracle: config.chainlinkPriceFeed.BTC_USD,
-      //   isWhitelisted: true,
-      //   priceTolerance: BigNumber.from(padZeros(9, 17)),
-      //   priceDecimal: 8,
-      //   tokenDecimal: 8,
-      //   heartBeat: 100000
-      // }
-      // console.log("setPriceSource for BTC...")
-      // await D3Oracle.setPriceSource(config.defaultAddress.BTCb, priceSourceBTC);
+      const priceSourceBTC = {
+        oracle: config.chainlinkPriceFeed.BTC_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 8,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for BTC...")
+      await D3Oracle.setPriceSource(config.defaultAddress.BTCb, priceSourceBTC);
 
-      // const priceSourceETH = {
-      //   oracle: config.chainlinkPriceFeed.ETH_USD,
-      //   isWhitelisted: true,
-      //   priceTolerance: BigNumber.from(padZeros(9, 17)),
-      //   priceDecimal: 8,
-      //   tokenDecimal: 18,
-      //   heartBeat: 100000
-      // }
-      // console.log("setPriceSource for ETH...")
-      // await D3Oracle.setPriceSource(config.defaultAddress.WETH, priceSourceETH);
+      const priceSourceETH = {
+        oracle: config.chainlinkPriceFeed.ETH_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 18,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for ETH...")
+      await D3Oracle.setPriceSource(config.defaultAddress.WETH, priceSourceETH);
 
       const priceSourceUSDT = {
         oracle: config.chainlinkPriceFeed.USDT_USD,
@@ -115,6 +111,29 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
       console.log("setPriceSource for USDTe...")
       await D3Oracle.setPriceSource(config.defaultAddress.USDTe, priceSourceUSDT);
+
+      const priceSourceUSDC = {
+        oracle: config.chainlinkPriceFeed.USDC_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 6,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for USDC...")
+      await D3Oracle.setPriceSource(config.defaultAddress.USDC, priceSourceUSDC);
+
+      const priceSourceAVAX = {
+        oracle: config.chainlinkPriceFeed.AVAX_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 18,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for AVAX...")
+      await D3Oracle.setPriceSource(config.defaultAddress.WAVAX, priceSourceAVAX);
+
     }
   }
 
@@ -137,6 +156,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       
       console.log("setStableCurve for USDTe...")
       await D3RateManager.setStableCurve(config.defaultAddress.USDTe, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+
+      console.log("setStableCurve for USDC...")
+      await D3RateManager.setStableCurve(config.defaultAddress.USDC, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+
+      console.log("setStableCurve for WAVAX...")
+      await D3RateManager.setStableCurve(config.defaultAddress.WAVAX, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
     }
   }
 
