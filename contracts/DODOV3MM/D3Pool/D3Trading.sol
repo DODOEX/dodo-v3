@@ -96,7 +96,7 @@ contract D3Trading is D3Funding {
         uint256 fromAmount,
         uint256 minReceiveAmount,
         bytes calldata data
-    ) external poolOngoing nonReentrant returns (uint256) {
+    ) external virtual poolOngoing nonReentrant returns (uint256) {
         require(ID3Maker(state._MAKER_).checkHeartbeat(), Errors.HEARTBEAT_CHECK_FAIL);
 
         _updateCumulative(fromToken);
@@ -137,7 +137,7 @@ contract D3Trading is D3Funding {
         uint256 quoteAmount,
         uint256 maxPayAmount,
         bytes calldata data
-    ) external poolOngoing nonReentrant returns (uint256) {
+    ) external virtual poolOngoing nonReentrant returns (uint256) {
         require(ID3Maker(state._MAKER_).checkHeartbeat(), Errors.HEARTBEAT_CHECK_FAIL);
 
         _updateCumulative(fromToken);

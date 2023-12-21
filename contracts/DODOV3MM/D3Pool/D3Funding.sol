@@ -74,7 +74,7 @@ contract D3Funding is D3Storage {
         emit MakerDeposit(token, tokenInAmount);
     }
 
-    function makerWithdraw(address to, address token, uint256 amount) external onlyOwner nonReentrant poolOngoing {
+    function makerWithdraw(address to, address token, uint256 amount) external virtual onlyOwner nonReentrant poolOngoing {
         IERC20(token).safeTransfer(to, amount);
 
         _updateReserve(token);

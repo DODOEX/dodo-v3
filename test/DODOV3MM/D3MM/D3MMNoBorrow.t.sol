@@ -24,6 +24,11 @@ contract D3MMNoBorrowTest is TestContext {
 
     MockERC20 public token5;
 
+    struct SwapCallbackData {
+        bytes data;
+        address payer;
+    }
+
     event ReplaceToken(address indexed oldToken, address indexed newToken);
 
     function setUp() public {
@@ -48,6 +53,7 @@ contract D3MMNoBorrowTest is TestContext {
         vm.startPrank(poolCreator);
         d3MMNoBorrow.makerDeposit(address(token1));
         d3MMNoBorrow.makerDeposit(address(token2));
+        d3MMNoBorrow.makerDeposit(address(token3));
         d3MMNoBorrow.makerDeposit(address(token5));
         vm.stopPrank();
 
@@ -213,7 +219,7 @@ contract D3MMNoBorrowTest is TestContext {
         uint256 indexOfToken8 = uint256(d3MakerFreeSlotWithPool.getOneTokenOriginIndex(address(token8)));
         assertEq(indexOfToken8, 1);
     }
-    
+
     // test if maker can still withdraw a token if a token is replaced by new token
     function testWithdrawAfterReplaceToken() public {
         MockERC20 token6 = new MockERC20("Token 6", "TK6", 18);
@@ -234,5 +240,71 @@ contract D3MMNoBorrowTest is TestContext {
         d3MMNoBorrow.makerWithdraw(address(this), address(token1), 3321);
         uint256 token1BalanceAfter = token1.balanceOf(address(this));
         assertEq(token1BalanceAfter - token1BalanceBefore, 3321);
+    }
+
+    function test_SellTokens() public {
+        uint256 beforeBalance2 = token2.balanceOf(user1);
+        uint256 beforeBalance3 = token3.balanceOf(user1);
+
+        SwapCallbackData memory swapData;
+        swapData.data = "";
+        swapData.payer = user1;
+
+        uint256 gasleft1 = gasleft();
+        vm.prank(user1);
+        uint256 receiveToToken = d3Proxy.sellTokens(
+            address(d3MMNoBorrow),
+            user1,
+            address(token2),
+            address(token3),
+            1 ether,
+            0,
+            abi.encode(swapData),
+            block.timestamp + 1000
+        );
+        uint256 gasleft2 = gasleft();
+        console.log("sellToken1stTime gas\t", gasleft1 - gasleft2);
+
+        uint256 afterBalance2 = token2.balanceOf(user1);
+        uint256 afterBalance3 = token3.balanceOf(user1);
+
+        //console.log(receiveToToken);
+        assertEq(beforeBalance2 - afterBalance2, 1 ether);
+        assertEq(afterBalance3 - beforeBalance3, receiveToToken);
+        assertEq(afterBalance3 - beforeBalance3, 11978524479259449453);
+    }
+
+    function test_BuyTokens() public {
+        uint256 beforeBalance2 = token2.balanceOf(user1);
+        uint256 beforeBalance3 = token3.balanceOf(user1);
+
+        SwapCallbackData memory swapData;
+        swapData.data = "";
+        swapData.payer = user1;
+
+        uint256 gasleft1 = gasleft();
+        vm.prank(user1);
+        uint256 receiveToToken = d3Proxy.buyTokens(
+            address(d3MMNoBorrow),
+            user1,
+            address(token2),
+            address(token3),
+            1 ether,
+            30 ether,
+            abi.encode(swapData),
+            block.timestamp + 1000
+        );
+        uint256 gasleft2 = gasleft();
+        console.log("buyToken1stTime gas\t", gasleft1 - gasleft2);
+
+        uint256 afterBalance2 = token2.balanceOf(user1);
+        uint256 afterBalance3 = token3.balanceOf(user1);
+
+        //console.log(beforeBalance2 - afterBalance2);
+        //console.log(afterBalance3 - beforeBalance3);
+
+        assertEq(beforeBalance2 - afterBalance2, receiveToToken);
+        assertEq(beforeBalance2 - afterBalance2, 83468096707748715); // 0.08
+        assertEq(afterBalance3 - beforeBalance3, 1 ether);
     }
 }
