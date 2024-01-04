@@ -82,6 +82,7 @@ contract TestContext is Test {
     D3Maker public d3MakerWithPool;
     D3UserQuota public d3UserQuota;
 
+    uint256 public constant DEFAULT_MINIMUM_DTOKEN = 1000;
 
     function createD3MMFactory() public {
         d3MMTemp = new MockD3MM();

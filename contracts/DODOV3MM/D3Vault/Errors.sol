@@ -27,6 +27,7 @@ library Errors {
     string public constant NOT_ENOUGH_COLLATERAL_FOR_BORROW = "D3VAULT_NOT_ENOUGH_COLLATERAL_FOR_BORROW";
     string public constant AMOUNT_EXCEED = "D3VAULT_AMOUNT_EXCEED";
     string public constant NOT_RATE_MANAGER = "D3VAULT_NOT_RATE_MANAGER";
+    string public constant MINIMUM_DTOKEN = "MINIMUM_DTOKEN";
 
     // ---------- liquidation ----------
     string public constant COLLATERAL_AMOUNT_EXCEED = "D3VAULT_COLLATERAL_AMOUNT_EXCEED";
