@@ -62,6 +62,8 @@ contract D3RateManager is Ownable {
     /// @param utilizationRatio Token utilization rate.
     function getBorrowRate(address token, uint256 utilizationRatio) public view returns (uint256 rate) {
         RateStrategy memory s = rateStrategyMap[token];
+        // notice! limit utilizationRatio <= 100%
+        utilizationRatio = utilizationRatio > 1e18 ? 1e18 : utilizationRatio;
         if (utilizationRatio <= s.optimalUsage) {
             rate = s.baseRate + utilizationRatio.mul(s.slope1);
         } else {
