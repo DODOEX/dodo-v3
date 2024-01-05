@@ -78,34 +78,36 @@ contract D3UserQuotaTest is TestContext {
         _tiers[1] = 1000 * 1e18;
         _tiers[2] = 10000 * 1e18;
         uint256[] memory _amounts = new uint256[](3);
-        _amounts[0] = 100;
-        _amounts[1] = 1000;
-        _amounts[2] = 10000;
+        _amounts[0] = 100e8;
+        _amounts[1] = 1000e8;
+        _amounts[2] = 10000e8;
         d3UserQuota.setTiers(address(token1), _tiers, _amounts);
-        faucetToken(address(token1), user1, 1000 * 1e8);
-        userDeposit(user1,address(token1), 5);
+        
+        faucetToken(address(token1), user1,  5e8);
+        userDeposit(user1,address(token1), 5e8);
+
         uint256 userQuota = d3UserQuota.getUserQuota(user1, address(token1));
-        assertEq(userQuota, 100 - 5);
+        assertEq(userQuota, 100e8 - 5e8 + DEFAULT_MINIMUM_DTOKEN);
 
         faucetToken(address(dodo), user1, 10 * 1e18);
         userQuota = d3UserQuota.getUserQuota(user1, address(token1));
-        assertEq(userQuota, 100 - 5);
+        assertEq(userQuota, 100e8 - 5e8 + DEFAULT_MINIMUM_DTOKEN);
 
         faucetToken(address(dodo), user1, 200 * 1e18);
         userQuota = d3UserQuota.getUserQuota(user1, address(token1));
-        assertEq(userQuota, 1000 - 5);
+        assertEq(userQuota, 1000e8 - 5e8 + DEFAULT_MINIMUM_DTOKEN);
 
         faucetToken(address(dodo), user1, 1000 * 1e18);
         userQuota = d3UserQuota.getUserQuota(user1, address(token1));
-        assertEq(userQuota, 10000 - 5);
+        assertEq(userQuota, 10000e8 - 5e8 + DEFAULT_MINIMUM_DTOKEN);
 
         faucetToken(address(dodo), user1, 10000 * 1e18);
         userQuota = d3UserQuota.getUserQuota(user1, address(token1));
-        assertEq(userQuota, 10000 - 5);
+        assertEq(userQuota, 10000e8 - 5e8 + DEFAULT_MINIMUM_DTOKEN);
 
         faucetToken(address(dodo), user1, 20000 * 1e18);
         userQuota = d3UserQuota.getUserQuota(user1, address(token1));
-        assertEq(userQuota, 10000 - 5);
+        assertEq(userQuota, 10000e8 - 5e8 + DEFAULT_MINIMUM_DTOKEN);
     }
 
     function testCheckQuota() public {

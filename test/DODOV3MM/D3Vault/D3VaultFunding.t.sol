@@ -32,6 +32,12 @@ contract D3VaultFundingTest is TestContext {
         vm.prank(user2);
         token1.approve(address(dodoApprove), type(uint256).max);
 
+        // case 0: fail - minimum amount required for the first deposit
+        mockUserQuota.setUserQuota(user1, address(token1), 2000);
+        vm.prank(user1);
+        vm.expectRevert(bytes(Errors.MINIMUM_DTOKEN));
+        d3Proxy.userDeposit(user1, address(token1), DEFAULT_MINIMUM_DTOKEN - 1, 0);
+
         // case 1: fail - exceed quota
         vm.prank(user1);
         vm.expectRevert(bytes(Errors.EXCEED_QUOTA));
@@ -41,7 +47,7 @@ contract D3VaultFundingTest is TestContext {
         mockUserQuota.setUserQuota(user1, address(token1), 1000 * 1e8);
         vm.prank(user1);
         d3Proxy.userDeposit(user1, address(token1), 500 * 1e8, 0);
-        assertEq(D3Token(dToken1).balanceOf(user1), 500 * 1e8);
+        assertEq(D3Token(dToken1).balanceOf(user1), 500 * 1e8 - DEFAULT_MINIMUM_DTOKEN); // 1000 dToken is locked to address(1)
         
         // case 3: exceed max deposit
         mockUserQuota.setUserQuota(user2, address(token1), 1000 * 1e8);
@@ -65,9 +71,9 @@ contract D3VaultFundingTest is TestContext {
         d3Proxy.userDeposit(user1, address(token1), 100 * 1e8, 0);
         
         uint256 balance1 = token1.balanceOf(user1);
-        userWithdraw(user1, address(token1), 100 * 1e8);
+        userWithdraw(user1, address(token1), 100 * 1e8 - DEFAULT_MINIMUM_DTOKEN);
         uint256 balance2 = token1.balanceOf(user1);
-        assertEq(balance2 - balance1, 100 * 1e8);
+        assertEq(balance2 - balance1, 100 * 1e8 - DEFAULT_MINIMUM_DTOKEN);
 
         // case: withdraw amount larger than dToken balance
         vm.expectRevert(bytes(Errors.DTOKEN_BALANCE_NOT_ENOUGH));
@@ -252,7 +258,8 @@ contract D3VaultFundingTest is TestContext {
 
         vm.stopPrank();
 
-        userWithdraw(user1, address(token1), 10 * 1e8);
+        userWithdraw(user1, address(token1), 10 * 1e8 - DEFAULT_MINIMUM_DTOKEN);
+        userWithdraw(address(1), address(token1), DEFAULT_MINIMUM_DTOKEN);
 
         vm.expectRevert(bytes(Errors.AMOUNT_EXCEED_VAULT_BALANCE));
         poolBorrow(address(d3MM), address(token1), 1);

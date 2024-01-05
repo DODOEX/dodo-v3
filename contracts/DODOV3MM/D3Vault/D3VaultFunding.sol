@@ -38,7 +38,16 @@ contract D3VaultFunding is D3VaultStorage {
         require(totalDToken.mul(exchangeRate) + amount <= info.maxDepositAmount, Errors.EXCEED_MAX_DEPOSIT_AMOUNT);
         dTokenAmount = amount.div(exchangeRate);
 
-        IDToken(info.dToken).mint(user, dTokenAmount);
+        if (totalDToken == 0) {
+            // permanently lock a very small amount of dTokens into address(1), which reduces potential issues with rounding, 
+            // and also prevents the pool from ever being fully drained
+            require(dTokenAmount > DEFAULT_MINIMUM_DTOKEN, Errors.MINIMUM_DTOKEN);
+            IDToken(info.dToken).mint(address(1), DEFAULT_MINIMUM_DTOKEN);
+            IDToken(info.dToken).mint(user, dTokenAmount - DEFAULT_MINIMUM_DTOKEN);
+        } else {
+            IDToken(info.dToken).mint(user, dTokenAmount);
+        }
+
         info.balance = realBalance;
 
         emit UserDeposit(user, token, amount, dTokenAmount);
