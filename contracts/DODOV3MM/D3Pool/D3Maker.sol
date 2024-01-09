@@ -26,6 +26,10 @@ contract D3Maker is InitializableOwnable {
     event SetNewToken(address indexed token);
 
     // ============== init =============
+    /// @notice Initializes the contract with the owner, pool, and maxInterval
+    /// @param owner The address of the owner
+    /// @param pool The address of the pool
+    /// @param maxInterval The maximum interval
     function init(address owner, address pool, uint256 maxInterval) external {
         initOwner(owner);
         _POOL_ = pool;
@@ -33,6 +37,10 @@ contract D3Maker is InitializableOwnable {
     }
 
     // ============= Read for tokenMMInfo =================
+    /// @notice Returns the TokenMMInfo for a given token
+    /// @param token The address of the token
+    /// @return tokenMMInfo The TokenMMInfo of the token
+    /// @return tokenIndex The index of the token
     function getTokenMMInfoForPool(address token)
         external
         view
@@ -65,7 +73,9 @@ contract D3Maker is InitializableOwnable {
 
     // ================== Read parameters ==============
 
-    /// @notice give one token's address, give back token's priceInfo
+    /// @notice This function returns the price set for a given token
+    /// @param token The address of the token
+    /// @return priceSet The price set of the token
     function getOneTokenPriceSet(address token) public view returns (uint80 priceSet) {
         require(state.priceListInfo.tokenIndexMap[token] > 0, Errors.INVALID_TOKEN);
         uint256 tokenOriIndex = state.priceListInfo.tokenIndexMap[token] - 1;
@@ -80,6 +90,7 @@ contract D3Maker is InitializableOwnable {
     }
 
     /// @notice get one token index. odd for none-stable, even for stable,  true index = (tokenIndex[address] - 1) / 2
+    /// @param token The address of the token
     function getOneTokenOriginIndex(address token) public view returns (int256) {
         //require(state.priceListInfo.tokenIndexMap[token] > 0, Errors.INVALID_TOKEN);
         return int256(state.priceListInfo.tokenIndexMap[token]) - 1;
@@ -122,6 +133,7 @@ contract D3Maker is InitializableOwnable {
             + (priceSet << (slotInnerIndex * MakerTypes.ONE_PRICE_BIT)) + rightPriceSet;
     }
 
+    /// @notice check heartbeat
     function checkHeartbeat() public view returns (bool) {
         if (block.timestamp - state.heartBeat.lastHeartBeat <= state.heartBeat.maxInterval) {
             return true;
@@ -130,6 +142,7 @@ contract D3Maker is InitializableOwnable {
         }
     }
 
+    /// @notice get pool's token list
     function getPoolTokenListFromMaker() external view returns(address[] memory tokenlist) {
         return poolTokenlist;
     }
@@ -137,6 +150,7 @@ contract D3Maker is InitializableOwnable {
     // ============= Set params ===========
 
     /// @notice maker could use multicall to set different params in one tx.
+    /// @param data A list of calldata to call
     function multicall(bytes[] calldata data) external returns (bytes[] memory results) {
         results = new bytes[](data.length);
         for (uint256 i = 0; i < data.length; i++) {
@@ -387,6 +401,7 @@ contract D3Maker is InitializableOwnable {
     }
 
     /// @notice set acceptable setting interval, if setting gap > maxInterval, swap will revert.
+    /// @param newMaxInterval The new max interval for heartbeat
     function setHeartbeat(uint256 newMaxInterval) public onlyOwner {
         state.heartBeat.maxInterval = newMaxInterval;
 

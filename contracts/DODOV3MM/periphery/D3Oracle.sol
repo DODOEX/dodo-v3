@@ -15,6 +15,8 @@ struct PriceSource {
     uint256 heartBeat;
 }
 
+/// @title D3Oracle
+/// @notice This contract is the price oracle for the assets in DODO V3
 contract D3Oracle is ID3Oracle, InitializableOwnable {
     // originToken => priceSource
     mapping(address => PriceSource) public priceSources;
@@ -34,6 +36,7 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
     /// @notice For non-L2 network, should be address(0)
     /// @notice For a list of available Sequencer Uptime Feed proxy addresses, 
     /// @notice see: https://docs.chain.link/docs/data-feeds/l2-sequencer-feeds
+    /// @param addr The sequencer address
     function setSequencer(address addr) external onlyOwner {
         sequencerFeed = addr;
     }
@@ -66,6 +69,7 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
 
     /// @notice Return the original price from price feed
     /// @notice For example, if WBTC price is 30000e8, return (30000e8, 8)
+    /// @param token The token address
     function getOriginalPrice(address token) public view override returns (uint256, uint8) {
         uint256 price = getPriceFromFeed(token);
         uint8 priceDecimal = priceSources[token].priceDecimal;
@@ -74,6 +78,7 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
 
     /// @notice If the price decimals is not 18, parse it to 18
     /// @notice For example, if WBTC price is 30000e8, return 30000e18
+    /// @param token The token address
     function getDec18Price(address token) public view override returns (uint256) {
         uint256 price = getPriceFromFeed(token);
         return price * 10 ** (18 - priceSources[token].priceDecimal);
@@ -99,6 +104,8 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
         return DecimalMath.div((fromAmount * getDec18Price(fromToken)) / getDec18Price(toToken), DecimalMath.mul(fromTlr, toTlr));
     }
 
+    /// @notice Get price from feed
+    /// @param token The token address
     function getPriceFromFeed(address token) internal view returns (uint256) {
         checkSequencerActive();
         require(priceSources[token].isWhitelisted, "INVALID_TOKEN");
@@ -110,6 +117,7 @@ contract D3Oracle is ID3Oracle, InitializableOwnable {
         return uint256(price);
     }
 
+    /// @notice Check if the sequencer is active
     function checkSequencerActive() internal view {
         // for non-L2 network, sequencerFeed should be set to address(0)
         if (sequencerFeed == address(0)) return;

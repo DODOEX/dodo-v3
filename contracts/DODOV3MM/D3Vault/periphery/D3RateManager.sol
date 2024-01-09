@@ -4,7 +4,8 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../../lib/DecimalMath.sol";
 import "../../intf/ID3Vault.sol";
-/// @title RateManager
+
+/// @title D3RateManager
 /// @notice  This contract is responsible for calculating the borrowing interest rate.
 contract D3RateManager is Ownable {
     using DecimalMath for uint256;
@@ -54,12 +55,16 @@ contract D3RateManager is Ownable {
     }
 
     /// @notice  Set token new type 
+    /// @param token The token address
+    /// @param tokenType The token type
     function setTokenType(address token, uint256 tokenType) external onlyOwner {
         tokenTypeMap[token] = tokenType;
     }
+
     /// @notice  Get the borrowing interest rate for the token.
     /// @param token Token address
     /// @param utilizationRatio Token utilization rate.
+    /// @return rate The borrowing interest rate
     function getBorrowRate(address token, uint256 utilizationRatio) public view returns (uint256 rate) {
         RateStrategy memory s = rateStrategyMap[token];
         if (utilizationRatio <= s.optimalUsage) {

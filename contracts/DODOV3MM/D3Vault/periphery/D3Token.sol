@@ -20,6 +20,9 @@ contract D3Token is InitializableOwnable, ERC20("DODOV3 Token", "D3Token") {
 
     // ============ Functions ============
 
+    /// @notice Initialize the contract
+    /// @param token The original token address
+    /// @param pool The pool address
     function init(address token, address pool) external {
         initOwner(pool);
         originToken = token;
@@ -27,14 +30,17 @@ contract D3Token is InitializableOwnable, ERC20("DODOV3 Token", "D3Token") {
         _name = string.concat(_symbol, "_", addressToShortString(pool));
     }
 
+    /// @notice Get the symbol of the token
     function symbol() public view override returns (string memory) {
         return _symbol;
     }
 
+    /// @notice Get the name of the token
     function name() public view override returns (string memory) {
         return _name;
     }
 
+    /// @notice Get the decimals of the token
     function decimals() public view override returns (uint8) {
         return IERC20Metadata(originToken).decimals();
     }
@@ -62,18 +68,23 @@ contract D3Token is InitializableOwnable, ERC20("DODOV3 Token", "D3Token") {
     }
 
     /// @notice Mint certain amount of token for user
+    /// @param user The user address
+    /// @param value The amount of token to mint
     function mint(address user, uint256 value) external onlyOwner {
         _mint(user, value);
         emit Mint(user, value);
     }
 
     /// @notice Burn certain amount of token on user account
+    /// @param user The user address
+    /// @param value The amount of token to burn
     function burn(address user, uint256 value) external onlyOwner {
         _burn(user, value);
         emit Burn(user, value);
     }
 
     /// @notice Convert the address to a shorter string
+    /// @param _addr The address to convert
     function addressToShortString(address _addr) public pure returns (string memory) {
         bytes32 value = bytes32(uint256(uint160(_addr)));
         bytes memory alphabet = "0123456789abcdef";
