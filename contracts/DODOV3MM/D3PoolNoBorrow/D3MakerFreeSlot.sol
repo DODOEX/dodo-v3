@@ -78,6 +78,7 @@ contract D3MakerFreeSlot is D3Maker {
         // to avoid reset the same token, tokenIndexMap record index from 1, but actualIndex = tokenIndex[address] - 1
         state.priceListInfo.tokenIndexMap[token] = tokenIndex + 1;
         state.tokenMMInfoMap[token].tokenIndex = uint16(tokenIndex);
+        state.priceListInfo.tokenIndexMap[oldToken] = 0;
 
         emit SetNewToken(token);
         emit ReplaceToken(oldToken, token);

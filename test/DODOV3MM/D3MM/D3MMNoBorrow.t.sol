@@ -220,6 +220,78 @@ contract D3MMNoBorrowTest is TestContext {
         assertEq(indexOfToken8, 1);
     }
 
+    function testAddOldTokenAgainAfterReplacement() public {
+        Types.TokenMMInfo memory tokenMMInfo;
+        uint256 tokenIndex;
+
+        // Creating a new token (token6) for testing purposes.
+        MockERC20 token6 = new MockERC20("Token 6", "TK6", 18);
+
+        // Verifying that token2 currently exists at index 2 in the token mapping.
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token2));
+        assertEq(tokenIndex, 2);
+
+        // Confirming that the new token (token6) does not yet exist in the mapping.
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token6));
+        assertEq(tokenIndex, 0);
+
+        // Replacing token2 with token6
+        MakerTypes.TokenMMInfoWithoutCum memory token6Info = contructToken1MMInfo();
+        vm.prank(maker);
+        d3MakerFreeSlotWithPool.setNewTokenAndReplace(
+            address(token6),
+            true,
+            token6Info.priceInfo,
+            token6Info.amountInfo,
+            token6Info.kAsk,
+            token6Info.kBid,
+            address(token2)
+        );
+
+        // Checking that token6 has taken over the index position of token2.
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token6));
+        assertEq(tokenIndex, 2);
+
+        // Ensuring that token2 is no longer present in the pool.
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token2));
+        assertEq(tokenIndex, 0);
+
+        // Confirming that token2's original index in the mapping should be -1, since it is removed.
+        assertEq(d3MakerFreeSlotWithPool.getOneTokenOriginIndex(address(token2)), -1);
+
+        // Validation Phase
+        // In this section, we attempt to re-add token2 back to the pool in place of token6, expecting it to succeed.
+
+        // Attempt to replace token6 with token2 again
+        MakerTypes.TokenMMInfoWithoutCum memory token2Info = contructToken2MMInfo();
+        vm.prank(maker);
+        d3MakerFreeSlotWithPool.setNewTokenAndReplace(
+            address(token2),
+            true,
+            token2Info.priceInfo,
+            token2Info.amountInfo,
+            token2Info.kAsk,
+            token2Info.kBid,
+            address(token6)
+        );
+
+        // token2 has replaced token6, so the index is 2
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token2));
+        assertEq(tokenIndex, 2);
+
+        // Ensuring that token6 is no longer present in the pool.
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token6));
+        assertEq(tokenIndex, 0);
+
+        // Attempt to add token6 back as a completely new token
+        vm.startPrank(maker);
+        d3MakerFreeSlotWithPool.setNewToken(
+            address(token6), true, token6Info.priceInfo, token6Info.amountInfo, token6Info.kAsk, token6Info.kBid
+        );
+        (tokenMMInfo, tokenIndex) = d3MakerFreeSlotWithPool.getTokenMMInfoForPool(address(token6));
+        assertEq(tokenIndex, 8);
+    }
+
     // test if maker can still withdraw a token if a token is replaced by new token
     function testWithdrawAfterReplaceToken() public {
         MockERC20 token6 = new MockERC20("Token 6", "TK6", 18);
