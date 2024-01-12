@@ -82,7 +82,7 @@ contract D3VaultFunding is D3VaultStorage {
 
     // ---------- Pool Fund ----------
 
-    /// @notice Pool borrow function
+    /// @notice Pool borrow function. This function can only be called by D3Pool.
     /// @param token The address of the token
     /// @param amount The amount of token to borrow
     function poolBorrow(address token, uint256 amount) external nonReentrant allowedToken(token) onlyPool {
@@ -106,7 +106,7 @@ contract D3VaultFunding is D3VaultStorage {
         emit PoolBorrow(msg.sender, token, amount, interests);
     }
 
-    /// @notice Pool repay function
+    /// @notice Pool repay function. This function can only be called by D3Pool.
     /// @param token The address of the token
     /// @param amount The amount of token to repay
     function poolRepay(address token, uint256 amount) external nonReentrant allowedToken(token) onlyPool {

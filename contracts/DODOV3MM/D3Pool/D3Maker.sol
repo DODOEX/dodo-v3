@@ -99,6 +99,7 @@ contract D3Maker is InitializableOwnable {
     /// @notice get all stable token Info
     /// @return numberOfStable stable tokens' quantity
     /// @return tokenPriceStable stable tokens' price slot array. each data contains up to 3 token prices
+    /// @return curFlag current flags for all token in one slot
     function getStableTokenInfo()
         external
         view
@@ -112,6 +113,7 @@ contract D3Maker is InitializableOwnable {
     /// @notice get all non-stable token Info
     /// @return number stable tokens' quantity
     /// @return tokenPrices stable tokens' price slot array. each data contains up to 3 token prices
+    /// @return curFlag current flags for all token in one slot
     function getNSTokenInfo() external view returns (uint256 number, uint256[] memory tokenPrices, uint256 curFlag) {
         number = state.priceListInfo.numberOfNS;
         tokenPrices = state.priceListInfo.tokenPriceNS;
