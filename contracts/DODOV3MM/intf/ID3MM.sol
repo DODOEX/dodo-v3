@@ -18,6 +18,7 @@ interface ID3MM {
     function isInLiquidation() external view returns (bool);
     function updateReserveByVault(address) external;
     function setNewAllFlag(uint256) external;
+    function version() external pure returns (string memory);
 
     function init(
         address creator,

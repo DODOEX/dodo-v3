@@ -95,6 +95,10 @@ contract MakerTest is TestContext {
         d3Maker.setNewToken(
             address(token1), true, token1Info.priceInfo, token1Info.amountInfo, token1Info.kAsk, token1Info.kBid
         );
+
+        (uint256 lastHeartBeat, uint256 maxInterval) = d3Maker.getHeartbeat();
+        assertEq(lastHeartBeat, block.timestamp);
+        assertEq(maxInterval, 100000);
     }
 
     function testCallInvalidToken() public {
@@ -431,6 +435,10 @@ contract MakerTest is TestContext {
 
         vm.prank(owner);
         d3Maker.setHeartbeat(300);
+
+        (uint256 lastHeartBeat, uint256 maxInterval) = d3Maker.getHeartbeat();
+        assertEq(lastHeartBeat, block.timestamp);
+        assertEq(maxInterval, 300);
 
         vm.warp(302);
         checkHB = d3Maker.checkHeartbeat();

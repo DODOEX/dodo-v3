@@ -19,6 +19,8 @@ import {DODOMath} from "contracts/DODOV3MM/lib/DODOMath.sol";
 // This helper contract exposes internal library functions for coverage to pick up
 // check this link: https://github.com/foundry-rs/foundry/pull/3128#issuecomment-1241245086
 contract PMMRangeOrderHelper is Test {
+    string public version = "D3MM";
+
     function querySellTokens(
         Types.RangeOrderState memory roState,
         address fromToken,

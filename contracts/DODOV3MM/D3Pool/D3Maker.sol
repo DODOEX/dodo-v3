@@ -130,6 +130,11 @@ contract D3Maker is InitializableOwnable {
         }
     }
 
+    function getHeartbeat() external view returns (uint256 lastHeartBeat, uint256 maxInterval) {
+        lastHeartBeat =  state.heartBeat.lastHeartBeat;
+        maxInterval = state.heartBeat.maxInterval;
+    }
+
     function getPoolTokenListFromMaker() external view returns(address[] memory tokenlist) {
         return poolTokenlist;
     }

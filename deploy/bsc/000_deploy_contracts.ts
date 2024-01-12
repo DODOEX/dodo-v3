@@ -108,6 +108,28 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       }
       console.log("setPriceSource for USDT...")
       await D3Oracle.setPriceSource(config.defaultAddress.USDT, priceSourceUSDT);
+
+      const priceSourceUSDC = {
+        oracle: config.chainlinkPriceFeed.USDC_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 18,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for USDC...")
+      await D3Oracle.setPriceSource(config.defaultAddress.USDC, priceSourceUSDC);
+
+      const priceSourceCAKE = {
+        oracle: config.chainlinkPriceFeed.CAKE_USD,
+        isWhitelisted: true,
+        priceTolerance: BigNumber.from(padZeros(9, 17)),
+        priceDecimal: 8,
+        tokenDecimal: 18,
+        heartBeat: 100000
+      }
+      console.log("setPriceSource for CAKE...")
+      await D3Oracle.setPriceSource(config.defaultAddress.CAKE, priceSourceCAKE);
     }
   }
 
