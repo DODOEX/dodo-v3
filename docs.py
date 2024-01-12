@@ -12,6 +12,9 @@ for f in files:
     file = open(f, "r")
     lines = file.readlines()
     file.close()
+    if len(lines) == 2:
+        os.remove(f) # remove empty page
+        continue
     for i in range(len(lines)):
         if lines[i].startswith("function "):
             lines[i] = lines[i].replace("(", "(\n    ", 1).replace(")", "\n)", 1).replace(", ", ",\n    ").replace("struct ", "").replace("(\n    \n)", "()")
