@@ -32,16 +32,16 @@ contract D3VaultFunding is D3VaultStorage {
         AssetInfo storage info = assetInfo[token];
         uint256 realBalance = IERC20(token).balanceOf(address(this));
         uint256 amount = realBalance  - info.balance;
-        require(ID3UserQuota(_USER_QUOTA_).checkQuota(user, token, amount), Errors.EXCEED_QUOTA);
+        if (!ID3UserQuota(_USER_QUOTA_).checkQuota(user, token, amount)) revert Errors.D3VaultExceedQuota();
         uint256 exchangeRate = _getExchangeRate(token);
         uint256 totalDToken = IDToken(info.dToken).totalSupply();
-        require(totalDToken.mul(exchangeRate) + amount <= info.maxDepositAmount, Errors.EXCEED_MAX_DEPOSIT_AMOUNT);
+        if (totalDToken.mul(exchangeRate) + amount > info.maxDepositAmount) revert Errors.D3VaultExceedMaxDepositAmount();
         dTokenAmount = amount.div(exchangeRate);
 
         if (totalDToken == 0) {
             // permanently lock a very small amount of dTokens into address(1), which reduces potential issues with rounding, 
             // and also prevents the pool from ever being fully drained
-            require(dTokenAmount > DEFAULT_MINIMUM_DTOKEN, Errors.MINIMUM_DTOKEN);
+            if (dTokenAmount <= DEFAULT_MINIMUM_DTOKEN) revert Errors.D3VaultMinimumDToken();
             IDToken(info.dToken).mint(address(1), DEFAULT_MINIMUM_DTOKEN);
             IDToken(info.dToken).mint(user, dTokenAmount - DEFAULT_MINIMUM_DTOKEN);
         } else {
@@ -60,7 +60,7 @@ contract D3VaultFunding is D3VaultStorage {
     function userWithdraw(address to, address user, address token, uint256 dTokenAmount) external nonReentrant allowedToken(token) returns(uint256 amount) {
         accrueInterest(token);
         AssetInfo storage info = assetInfo[token];
-        require(dTokenAmount <= IDToken(info.dToken).balanceOf(msg.sender), Errors.DTOKEN_BALANCE_NOT_ENOUGH);
+        if (dTokenAmount > IDToken(info.dToken).balanceOf(msg.sender)) revert Errors.D3VaultDTokenBalanceNotEnough();
 
         amount = dTokenAmount.mul(_getExchangeRate(token));
         IDToken(info.dToken).burn(msg.sender, dTokenAmount);
@@ -83,8 +83,8 @@ contract D3VaultFunding is D3VaultStorage {
         AssetInfo storage info = assetInfo[token];
         BorrowRecord storage record = info.borrowRecord[msg.sender];
         uint256 usedQuota = _borrowAmount(record.amount, record.interestIndex, info.borrowIndex); // borrowAmount = record.amount * newIndex / oldIndex
-        require(amount + usedQuota <= quota, Errors.EXCEED_QUOTA);
-        require(amount <= info.balance - (info.totalReserves - info.withdrawnReserves), Errors.AMOUNT_EXCEED_VAULT_BALANCE);
+        if (amount + usedQuota > quota) revert Errors.D3VaultExceedQuota();
+        if (amount > info.balance - (info.totalReserves - info.withdrawnReserves)) revert Errors.D3VaultAmountExceedVaultBalance();
 
         uint256 interests = usedQuota - record.amount;
 
@@ -98,14 +98,14 @@ contract D3VaultFunding is D3VaultStorage {
     }
 
     function poolRepay(address token, uint256 amount) external nonReentrant allowedToken(token) onlyPool {
-        require(!ID3MM(msg.sender).isInLiquidation(), Errors.ALREADY_IN_LIQUIDATION);
+        if (ID3MM(msg.sender).isInLiquidation()) revert Errors.D3VaultAlreadyInLiquidation();
 
         accrueInterest(token);
 
         AssetInfo storage info = assetInfo[token];
         BorrowRecord storage record = info.borrowRecord[msg.sender];
         uint256 borrows = _borrowAmount(record.amount, record.interestIndex, info.borrowIndex); // borrowAmount = record.amount * newIndex / oldIndex
-        require(amount <= borrows, Errors.AMOUNT_EXCEED);
+        if (amount > borrows) revert Errors.D3VaultAmountExceed();
 
         uint256 interests = borrows - record.amount;
 
@@ -123,7 +123,7 @@ contract D3VaultFunding is D3VaultStorage {
     }
 
     function poolRepayAll(address token) external nonReentrant allowedToken(token) onlyPool {
-        require(!ID3MM(msg.sender).isInLiquidation(), Errors.ALREADY_IN_LIQUIDATION);
+        if (ID3MM(msg.sender).isInLiquidation()) revert Errors.D3VaultAlreadyInLiquidation();
         _poolRepayAll(msg.sender, token);
     }
 

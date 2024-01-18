@@ -36,22 +36,22 @@ contract D3VaultLiquidation is D3VaultFunding {
     ) external nonReentrant {
         accrueInterests();
 
-        require(!ID3MM(pool).isInLiquidation(), Errors.ALREADY_IN_LIQUIDATION);
-        require(!checkBadDebtAfterAccrue(pool), Errors.HAS_BAD_DEBT);
-        require(checkCanBeLiquidatedAfterAccrue(pool), Errors.CANNOT_BE_LIQUIDATED);
-        require(isPositiveNetWorthAsset(pool, collateral), Errors.INVALID_COLLATERAL_TOKEN);
-        require(!isPositiveNetWorthAsset(pool, debt), Errors.INVALID_DEBT_TOKEN);
-        require(getPositiveNetWorthAsset(pool, collateral) >= collateralAmount, Errors.COLLATERAL_AMOUNT_EXCEED);
+        if (ID3MM(pool).isInLiquidation()) revert Errors.D3VaultAlreadyInLiquidation();
+        if (checkBadDebtAfterAccrue(pool)) revert Errors.D3VaultHasBadDebt();
+        if (!checkCanBeLiquidatedAfterAccrue(pool)) revert Errors.D3VaultCannotBeLiquidated();
+        if (!isPositiveNetWorthAsset(pool, collateral)) revert Errors.D3VaultInvalidCollateralToken();
+        if (isPositiveNetWorthAsset(pool, debt)) revert Errors.D3VaultInvalidDebtToken();
+        if (getPositiveNetWorthAsset(pool, collateral) < collateralAmount) revert Errors.D3VaultCollateralAmountExceed();
         
         uint256 collateralTokenPrice = ID3Oracle(_ORACLE_).getPrice(collateral);
         uint256 debtTokenPrice = ID3Oracle(_ORACLE_).getPrice(debt);
         uint256 collateralAmountMax = debtToCover.mul(debtTokenPrice).div(collateralTokenPrice.mul(DISCOUNT));
-        require(collateralAmount <= collateralAmountMax, Errors.COLLATERAL_AMOUNT_EXCEED);
+        if (collateralAmount > collateralAmountMax) revert Errors.D3VaultCollateralAmountExceed();
 
         AssetInfo storage info = assetInfo[debt];
         BorrowRecord storage record = info.borrowRecord[pool];
         uint256 borrows = _borrowAmount(record.amount, record.interestIndex, info.borrowIndex); // borrowAmount = record.amount * newIndex / oldIndex
-        require(debtToCover <= borrows, Errors.DEBT_TO_COVER_EXCEED);
+        if (debtToCover > borrows) revert Errors.D3VaultDebtToCoverExceed();
         IERC20(debt).safeTransferFrom(msg.sender, address(this), debtToCover);
         
         if (info.totalBorrows < debtToCover) {
@@ -74,13 +74,13 @@ contract D3VaultLiquidation is D3VaultFunding {
     function startLiquidation(address pool) external onlyLiquidator nonReentrant {
         accrueInterests();
 
-        require(!ID3MM(pool).isInLiquidation(), Errors.ALREADY_IN_LIQUIDATION);
-        require(checkCanBeLiquidatedAfterAccrue(pool), Errors.CANNOT_BE_LIQUIDATED);
+        if (ID3MM(pool).isInLiquidation()) revert Errors.D3VaultAlreadyInLiquidation();
+        if (!checkCanBeLiquidatedAfterAccrue(pool)) revert Errors.D3VaultCannotBeLiquidated();
         ID3MM(pool).startLiquidation();
 
         uint256 totalAssetValue = getTotalAssetsValue(pool);
         uint256 totalDebtValue = _getTotalDebtValue(pool);
-        require(totalAssetValue < totalDebtValue, Errors.NO_BAD_DEBT);
+        if (totalAssetValue >= totalDebtValue) revert Errors.D3VaultNoBadDebt();
 
         uint256 ratio = totalAssetValue.div(totalDebtValue);
 
@@ -100,7 +100,7 @@ contract D3VaultLiquidation is D3VaultFunding {
         bytes calldata routeData,
         address router
     ) external onlyLiquidator onlyRouter(router) nonReentrant {
-        require(ID3MM(pool).isInLiquidation(), Errors.NOT_IN_LIQUIDATION);
+        if (!ID3MM(pool).isInLiquidation()) revert Errors.D3VaultNotInLiquidation();
 
         uint256 toTokenReserve = IERC20(order.toToken).balanceOf(address(this));
         uint256 fromTokenValue = DecimalMath.mul(ID3Oracle(_ORACLE_).getPrice(order.fromToken), order.fromAmount);
@@ -120,14 +120,14 @@ contract D3VaultLiquidation is D3VaultFunding {
         uint256 receivedToToken = IERC20(order.toToken).balanceOf(address(this)) - toTokenReserve;
         uint256 toTokenValue = DecimalMath.mul(ID3Oracle(_ORACLE_).getPrice(order.toToken), receivedToToken);
 
-        require(toTokenValue >= fromTokenValue.mul(DISCOUNT), Errors.EXCEED_DISCOUNT);
+        if (toTokenValue < fromTokenValue.mul(DISCOUNT)) revert Errors.D3VaultExceedDiscount();
         IERC20(order.toToken).safeTransfer(pool, receivedToToken);
         ID3MM(pool).updateReserveByVault(order.fromToken);
         ID3MM(pool).updateReserveByVault(order.toToken);
     }
 
     function finishLiquidation(address pool) external onlyLiquidator nonReentrant {
-        require(ID3MM(pool).isInLiquidation(), Errors.NOT_IN_LIQUIDATION);
+        if (!ID3MM(pool).isInLiquidation()) revert Errors.D3VaultNotInLiquidation();
         accrueInterests();
 
         bool hasPositiveBalance;
@@ -139,10 +139,10 @@ contract D3VaultLiquidation is D3VaultFunding {
             uint256 debt = liquidationTarget[pool][token];
             int256 difference = int256(balance) - int256(debt);
             if (difference > 0) {
-                require(!hasNegativeBalance, Errors.LIQUIDATION_NOT_DONE);
+                if (hasNegativeBalance) revert Errors.D3VaultLiquidationNotDone();
                 hasPositiveBalance = true;
             } else if (difference < 0) {
-                require(!hasPositiveBalance, Errors.LIQUIDATION_NOT_DONE);
+                if (hasPositiveBalance) revert Errors.D3VaultLiquidationNotDone();
                 hasNegativeBalance = true;
                 debt = balance; // if balance is less than target amount, just repay with balance
             }

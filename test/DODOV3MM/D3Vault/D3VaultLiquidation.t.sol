@@ -167,12 +167,12 @@ contract D3VaultLiquidationTest is TestContext {
     function testCannotBeLiquidated() public {
         contextCannotBeLiquidated();
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.CANNOT_BE_LIQUIDATED));
+        vm.expectRevert(Errors.D3VaultCannotBeLiquidated.selector);
         d3Vault.liquidate(address(d3MM), address(token1), 100 ether, address(token2), 100 ether);
 
         vm.prank(vaultOwner);
         d3Vault.addLiquidator(address(this));
-        vm.expectRevert(bytes(Errors.CANNOT_BE_LIQUIDATED));
+        vm.expectRevert(Errors.D3VaultCannotBeLiquidated.selector);
         d3Vault.startLiquidation(address(d3MM));
     }
 
@@ -181,32 +181,32 @@ contract D3VaultLiquidationTest is TestContext {
 
         vm.prank(vaultOwner);
         d3Vault.addLiquidator(address(this));
-        vm.expectRevert(bytes(Errors.NO_BAD_DEBT));
+        vm.expectRevert(Errors.D3VaultNoBadDebt.selector);
         d3Vault.startLiquidation(address(d3MM));
 
         // Case 1: pool has no token1 as collateral, should fail
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.COLLATERAL_AMOUNT_EXCEED));
+        vm.expectRevert(Errors.D3VaultCollateralAmountExceed.selector);
         d3Vault.liquidate(address(d3MM), address(token1), 100 ether, address(token2), 100 ether);
 
         // Case 2: token2 cannot be collateral, should fail
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.INVALID_COLLATERAL_TOKEN));
+        vm.expectRevert(Errors.D3VaultInvalidCollateralToken.selector);
         d3Vault.liquidate(address(d3MM), address(token2), 100 ether, address(token3), 100 ether);
 
         // Case 3: token3 cannot be debt, should fail
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.INVALID_DEBT_TOKEN));
+        vm.expectRevert(Errors.D3VaultInvalidDebtToken.selector);
         d3Vault.liquidate(address(d3MM), address(token3), 100 ether, address(token3), 100 ether);
 
         // Case 4: the collateral amount passed in is larger than token3 balance in pool, should fail
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.COLLATERAL_AMOUNT_EXCEED));
+        vm.expectRevert(Errors.D3VaultCollateralAmountExceed.selector);
         d3Vault.liquidate(address(d3MM), address(token3), 200 ether, address(token2), 100 ether);
 
         // Case 5: the debt to cover amount is larger than debt, should fail
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.DEBT_TO_COVER_EXCEED));
+        vm.expectRevert(Errors.D3VaultDebtToCoverExceed.selector);
         d3Vault.liquidate(address(d3MM), address(token3), 10 ether, address(token2), 100 ether);
 
         // Case 6: In this case, user2 try to use 1 token2 to get 20 token3, with the price discount,
@@ -219,7 +219,7 @@ contract D3VaultLiquidationTest is TestContext {
         token3.approve(address(d3Vault), type(uint256).max);
         
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.COLLATERAL_AMOUNT_EXCEED));
+        vm.expectRevert(Errors.D3VaultCollateralAmountExceed.selector);
         d3Vault.liquidate(address(d3MM), address(token3), 20 ether, address(token2), 1 ether);
 
         // Case 7: User2 try to use 2 token2 to get 25 token3, with the price discount,
@@ -253,25 +253,25 @@ contract D3VaultLiquidationTest is TestContext {
         contextBadDebt();
 
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.HAS_BAD_DEBT));
+        vm.expectRevert(Errors.D3VaultHasBadDebt.selector);
         d3Vault.liquidate(address(d3MM), address(token1), 100 ether, address(token2), 100 ether);
 
-        vm.expectRevert(bytes(Errors.NOT_ALLOWED_LIQUIDATOR));
+        vm.expectRevert(Errors.D3VaultNotAllowedLiquidator.selector);
         d3Vault.startLiquidation(address(d3MM));
 
         vm.prank(vaultOwner);
         d3Vault.addLiquidator(address(this));
         d3Vault.startLiquidation(address(d3MM));
 
-        vm.expectRevert(bytes(Errors.ALREADY_IN_LIQUIDATION));
+        vm.expectRevert(Errors.D3VaultAlreadyInLiquidation.selector);
         d3Vault.startLiquidation(address(d3MM));
 
         // When pool is in liquidation, cannot repay
         vm.startPrank(address(d3MM));
         token1.approve(address(d3Vault), type(uint256).max);
-        vm.expectRevert(bytes(Errors.ALREADY_IN_LIQUIDATION));
+        vm.expectRevert(Errors.D3VaultAlreadyInLiquidation.selector);
         d3Vault.poolRepay(address(token1), 100 * 1e8);
-        vm.expectRevert(bytes(Errors.ALREADY_IN_LIQUIDATION));
+        vm.expectRevert(Errors.D3VaultAlreadyInLiquidation.selector);
         d3Vault.poolRepayAll(address(token1));
         vm.stopPrank();
     }
@@ -281,7 +281,7 @@ contract D3VaultLiquidationTest is TestContext {
         vm.prank(vaultOwner);
         d3Vault.addLiquidator(liquidator);
 
-        vm.expectRevert(bytes(Errors.NOT_IN_LIQUIDATION));
+        vm.expectRevert(Errors.D3VaultNotInLiquidation.selector);
         liquidateSwap(address(d3MM), address(token3), address(token2), 12 ether);
 
         vm.prank(liquidator);
@@ -299,7 +299,7 @@ contract D3VaultLiquidationTest is TestContext {
         token3.approve(address(d3Vault), type(uint256).max);
 
         router.setSlippage(90);
-        vm.expectRevert(bytes(Errors.EXCEED_DISCOUNT));
+        vm.expectRevert(Errors.D3VaultExceedDiscount.selector);
         liquidateSwap(address(d3MM), address(token3), address(token2), 12 ether);
 
         router.setSlippage(100);
@@ -340,7 +340,7 @@ contract D3VaultLiquidationTest is TestContext {
         vm.prank(vaultOwner);
         d3Vault.removeRouter(address(liquidationRouter));
 
-        vm.expectRevert(bytes(Errors.NOT_ALLOWED_ROUTER));
+        vm.expectRevert(Errors.D3VaultNotAllowedRouter.selector);
         liquidateSwap(address(d3MM), address(token3), address(token2), 12 ether);
     }
 
@@ -349,7 +349,7 @@ contract D3VaultLiquidationTest is TestContext {
         d3Vault.addLiquidator(liquidator);
 
         vm.prank(liquidator);
-        vm.expectRevert(bytes(Errors.NOT_IN_LIQUIDATION));
+        vm.expectRevert(Errors.D3VaultNotInLiquidation.selector);
         d3Vault.finishLiquidation(address(d3MM));
 
         // pool has
@@ -368,7 +368,7 @@ contract D3VaultLiquidationTest is TestContext {
         token2.approve(address(d3Vault), type(uint256).max);
 
         vm.prank(liquidator);
-        vm.expectRevert(bytes(Errors.LIQUIDATION_NOT_DONE));
+        vm.expectRevert(Errors.D3VaultLiquidationNotDone.selector);
         d3Vault.finishLiquidation(address(d3MM));
 
         uint256 token2CashBefore = d3Vault.getCash(address(token2));
@@ -429,7 +429,7 @@ contract D3VaultLiquidationTest is TestContext {
         router.setSlippage(96);
         liquidateSwap(address(d3MM), address(token3), address(token2), 50 ether);
         vm.prank(liquidator);
-        vm.expectRevert(bytes(Errors.LIQUIDATION_NOT_DONE));
+        vm.expectRevert(Errors.D3VaultLiquidationNotDone.selector);
         d3Vault.finishLiquidation(address(d3MM));
     }
 }

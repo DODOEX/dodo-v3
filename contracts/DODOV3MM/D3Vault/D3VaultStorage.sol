@@ -99,32 +99,32 @@ contract D3VaultStorage is ReentrancyGuard, Ownable {
     event WithdrawReserves(address indexed token, uint256 amount);
 
     modifier onlyLiquidator() {
-        require(allowedLiquidator[msg.sender], Errors.NOT_ALLOWED_LIQUIDATOR);
+        if (!allowedLiquidator[msg.sender]) revert Errors.D3VaultNotAllowedLiquidator();
         _;
     }
 
     modifier onlyRouter(address router) {
-        require(allowedRouter[router], Errors.NOT_ALLOWED_ROUTER);
+        if (!allowedRouter[router]) revert Errors.D3VaultNotAllowedRouter();
         _;
     }
 
     modifier onlyPool() {
-        require(allPoolAddrMap[msg.sender], Errors.NOT_D3POOL);
+        if (!allPoolAddrMap[msg.sender]) revert Errors.D3VaultNotD3Pool();
         _;
     }
 
     modifier allowedToken(address token) {
-        require(tokens[token], Errors.NOT_ALLOWED_TOKEN);
+        if (!tokens[token]) revert Errors.D3VaultNotAllowedToken();
         _;
     }
 
     modifier onlyFactory() {
-        require(msg.sender == _D3_FACTORY_, Errors.NOT_D3_FACTORY);
+        if (msg.sender != _D3_FACTORY_) revert Errors.D3VaultNotD3Factory();
         _;
     }
 
     modifier onlyRemovingPool() {
-        require(msg.sender == _PENDING_REMOVE_POOL_, Errors.NOT_PENDING_REMOVE_POOL);
+        if (msg.sender != _PENDING_REMOVE_POOL_) revert Errors.D3VaultNotPendingRemovePool();
         _;
     }
 }

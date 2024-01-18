@@ -22,7 +22,7 @@ contract D3VaultTest is TestContext {
     function testAddAndRemoveD3Pool() public {
         // remove a pool never added before
         vm.prank(vaultOwner);
-        vm.expectRevert(bytes(Errors.POOL_NOT_ADDED));
+        vm.expectRevert(Errors.D3VaultPoolNotAdded.selector);
         d3Vault.removeD3Pool(address(1234));
 
         address pool = d3MMFactory.breedD3Pool(address(1234), address(1234), 100000, 0);
@@ -30,7 +30,7 @@ contract D3VaultTest is TestContext {
         assertEq(d3Vault.creatorPoolMap(address(1234), 0), pool);
 
         // D3MMFactory add an already added pool
-        vm.expectRevert(bytes(Errors.POOL_ALREADY_ADDED));
+        vm.expectRevert(Errors.D3VaultPoolAlreadyAdded.selector);
         d3MMFactory.addD3Pool(pool);
 
         vm.prank(vaultOwner);
@@ -43,12 +43,12 @@ contract D3VaultTest is TestContext {
 
         // add a pool which has already been added
         vm.prank(vaultOwner);
-        vm.expectRevert(bytes(Errors.POOL_ALREADY_ADDED));
+        vm.expectRevert(Errors.D3VaultPoolAlreadyAdded.selector);
         d3Vault.addD3Pool(pool);
 
         address pool2 = d3MMFactory.breedD3Pool(address(1234), address(1234), 100000, 0);
         vm.prank(vaultOwner);
-        vm.expectRevert(bytes(Errors.HAS_POOL_PENDING_REMOVE));
+        vm.expectRevert(Errors.D3VaultHasPoolPendingRemove.selector);
         d3Vault.removeD3Pool(pool2);
 
         vm.startPrank(vaultOwner);
@@ -101,7 +101,7 @@ contract D3VaultTest is TestContext {
 
         // pool is in "liquidation" state when pending remove
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.ALREADY_IN_LIQUIDATION));
+        vm.expectRevert(Errors.D3VaultAlreadyInLiquidation.selector);
         d3Vault.liquidate(address(d3MM), address(token1), 100 ether, address(token2), 100 ether);
         
         vm.prank(vaultOwner);
@@ -198,11 +198,11 @@ contract D3VaultTest is TestContext {
 
     function testAddNewToken() public {
         vm.startPrank(vaultOwner);
-        vm.expectRevert(bytes(Errors.TOKEN_ALREADY_EXIST));
+        vm.expectRevert(Errors.D3VaultTokenAlreadyExist.selector);
         d3Vault.addNewToken(address(token1), 0, 0, 0, 0, 0);
-        vm.expectRevert(bytes(Errors.WRONG_WEIGHT));
+        vm.expectRevert(Errors.D3VaultWrongWeight.selector);
         d3Vault.addNewToken(address(token4), 0, 0, 0, 0, 0);
-        vm.expectRevert(bytes(Errors.WRONG_RESERVE_FACTOR));
+        vm.expectRevert(Errors.D3VaultWrongReserveFactor.selector);
         d3Vault.addNewToken(address(token4), 0, 0, 80e16, 120e16, 2e18);
         d3Vault.addNewToken(address(token4), 0, 0, 80e16, 120e16, 20e16);
         vm.stopPrank();
@@ -210,11 +210,11 @@ contract D3VaultTest is TestContext {
 
     function testSetToken() public {
         vm.startPrank(vaultOwner);
-        vm.expectRevert(bytes(Errors.TOKEN_NOT_EXIST));
+        vm.expectRevert(Errors.D3VaultTokenNotExist.selector);
         d3Vault.setToken(address(token4), 0, 0, 0, 0, 0);
-        vm.expectRevert(bytes(Errors.WRONG_WEIGHT));
+        vm.expectRevert(Errors.D3VaultWrongWeight.selector);
         d3Vault.setToken(address(token1), 0, 0, 0, 0, 0);
-        vm.expectRevert(bytes(Errors.WRONG_RESERVE_FACTOR));
+        vm.expectRevert(Errors.D3VaultWrongReserveFactor.selector);
         d3Vault.setToken(address(token1), 0, 0, 80e16, 120e16, 2e18);
         d3Vault.setToken(address(token1), 0, 0, 80e16, 120e16, 20e16);
         vm.stopPrank(); 
@@ -293,14 +293,14 @@ contract D3VaultTest is TestContext {
         logAssetInfo(address(token2));
 
         vm.prank(vaultOwner);
-        vm.expectRevert(bytes(Errors.WITHDRAW_AMOUNT_EXCEED));
+        vm.expectRevert(Errors.D3VaultWithdrawAmountExceed.selector);
         d3Vault.withdrawReserves(address(token2), 101);
 
         // if _MAINTAINER_ is not set, withdrawReserves should revert
         vm.prank(vaultOwner);
         d3Vault.setMaintainer(address(0));
         vm.prank(vaultOwner);
-        vm.expectRevert(bytes(Errors.MAINTAINER_NOT_SET));
+        vm.expectRevert(Errors.D3VaultMaintainerNotSet.selector);
         d3Vault.withdrawReserves(address(token2), 101);
     }
 
@@ -324,7 +324,7 @@ contract D3VaultTest is TestContext {
         token2.transfer(address(d3Vault), 1000 ether);
 
         // userDeposit is blocked
-        vm.expectRevert(bytes(Errors.EXCEED_MAX_DEPOSIT_AMOUNT));
+        vm.expectRevert(Errors.D3VaultExceedMaxDepositAmount.selector);
         vm.prank(user1);
         d3Proxy.userDeposit(user1, address(token2), 500 ether, 0);
 
