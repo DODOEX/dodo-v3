@@ -11,7 +11,7 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
     // ---------- Setting ----------
 
     function addD3PoolByFactory(address pool) external onlyFactory {
-        require(allPoolAddrMap[pool] == false, Errors.POOL_ALREADY_ADDED);
+        if (allPoolAddrMap[pool] == true) revert Errors.D3VaultPoolAlreadyAdded();
         allPoolAddrMap[pool] = true;
         address creator = ID3MM(pool)._CREATOR_();
         creatorPoolMap[creator].push(pool);
@@ -19,7 +19,7 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
     }
 
     function addD3Pool(address pool) external onlyOwner {
-        require(allPoolAddrMap[pool] == false, Errors.POOL_ALREADY_ADDED);
+        if (allPoolAddrMap[pool] == true) revert Errors.D3VaultPoolAlreadyAdded();
         allPoolAddrMap[pool] = true;
         address creator = ID3MM(pool)._CREATOR_();
         creatorPoolMap[creator].push(pool);
@@ -38,8 +38,8 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
     /// @notice if the pool doesn't have borrows, we just need two steps:
     /// @notice removeD3Pool() -> finishPoolRemove()
     function removeD3Pool(address pool) external onlyOwner {
-        require(_PENDING_REMOVE_POOL_ == address(0), Errors.HAS_POOL_PENDING_REMOVE);
-        require(allPoolAddrMap[pool] == true, Errors.POOL_NOT_ADDED);
+        if (_PENDING_REMOVE_POOL_ != address(0)) revert Errors.D3VaultHasPoolPendingRemove();
+        if (allPoolAddrMap[pool] == false) revert Errors.D3VaultPoolNotAdded();
         ID3MM(pool).startLiquidation();
 
         allPoolAddrMap[pool] = false;
@@ -152,9 +152,9 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
         uint256 debtWeight,
         uint256 reserveFactor
     ) external onlyOwner {
-        require(!tokens[token], Errors.TOKEN_ALREADY_EXIST);
-        require(collateralWeight < 1e18 && debtWeight > 1e18, Errors.WRONG_WEIGHT);
-        require(reserveFactor < 1e18, Errors.WRONG_RESERVE_FACTOR);
+        if (tokens[token]) revert Errors.D3VaultTokenAlreadyExist();
+        if (collateralWeight >= 1e18 || debtWeight <= 1e18) revert Errors.D3VaultWrongWeight();
+        if (reserveFactor >= 1e18) revert Errors.D3VaultWrongReserveFactor();
         tokens[token] = true;
         tokenList.push(token);
         address dToken = createDToken(token);
@@ -184,9 +184,9 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
         uint256 debtWeight,
         uint256 reserveFactor
     ) external onlyOwner {
-        require(tokens[token], Errors.TOKEN_NOT_EXIST);
-        require(collateralWeight < 1e18 && debtWeight > 1e18, Errors.WRONG_WEIGHT);
-        require(reserveFactor < 1e18, Errors.WRONG_RESERVE_FACTOR);
+        if (!tokens[token]) revert Errors.D3VaultTokenNotExist();
+        if (collateralWeight >= 1e18 || debtWeight <= 1e18) revert Errors.D3VaultWrongWeight();
+        if (reserveFactor >= 1e18) revert Errors.D3VaultWrongReserveFactor();
         AssetInfo storage info = assetInfo[token];
         info.maxDepositAmount = maxDeposit;
         info.maxCollateralAmount = maxCollateral;
@@ -197,12 +197,12 @@ contract D3Vault is D3VaultFunding, D3VaultLiquidation {
     }
 
     function withdrawReserves(address token, uint256 amount) external nonReentrant allowedToken(token) onlyOwner {
-        require(_MAINTAINER_ != address(0), Errors.MAINTAINER_NOT_SET);
+        if (_MAINTAINER_ == address(0)) revert Errors.D3VaultMaintainerNotSet();
         accrueInterest(token);
         AssetInfo storage info = assetInfo[token];
         uint256 totalReserves = info.totalReserves;
         uint256 withdrawnReserves = info.withdrawnReserves;
-        require(amount <= totalReserves - withdrawnReserves, Errors.WITHDRAW_AMOUNT_EXCEED);
+        if (amount > totalReserves - withdrawnReserves) revert Errors.D3VaultWithdrawAmountExceed();
         info.withdrawnReserves = info.withdrawnReserves + amount;
         info.balance = info.balance - amount;
         IERC20(token).safeTransfer(_MAINTAINER_, amount);

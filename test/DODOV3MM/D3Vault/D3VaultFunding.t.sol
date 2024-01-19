@@ -35,12 +35,12 @@ contract D3VaultFundingTest is TestContext {
         // case 0: fail - minimum amount required for the first deposit
         mockUserQuota.setUserQuota(user1, address(token1), 2000);
         vm.prank(user1);
-        vm.expectRevert(bytes(Errors.MINIMUM_DTOKEN));
+        vm.expectRevert(Errors.D3VaultMinimumDToken.selector);
         d3Proxy.userDeposit(user1, address(token1), DEFAULT_MINIMUM_DTOKEN - 1, 0);
 
         // case 1: fail - exceed quota
         vm.prank(user1);
-        vm.expectRevert(bytes(Errors.EXCEED_QUOTA));
+        vm.expectRevert(Errors.D3VaultExceedQuota.selector);
         d3Proxy.userDeposit(user1, address(token1), 500 * 1e8, 0);
 
         // case 2: success
@@ -57,7 +57,7 @@ contract D3VaultFundingTest is TestContext {
         assertEq(token1.balanceOf(user2), 500 * 1e8);
 
         vm.prank(user2);
-        vm.expectRevert(bytes(Errors.EXCEED_MAX_DEPOSIT_AMOUNT));
+        vm.expectRevert(Errors.D3VaultExceedMaxDepositAmount.selector);
         d3Proxy.userDeposit(user2, address(token1), 1, 0);
         assertEq(token1.balanceOf(user2), 500 * 1e8);
     }
@@ -76,7 +76,7 @@ contract D3VaultFundingTest is TestContext {
         assertEq(balance2 - balance1, 100 * 1e8 - DEFAULT_MINIMUM_DTOKEN);
 
         // case: withdraw amount larger than dToken balance
-        vm.expectRevert(bytes(Errors.DTOKEN_BALANCE_NOT_ENOUGH));
+        vm.expectRevert(Errors.D3VaultDTokenBalanceNotEnough.selector);
         userWithdraw(user1, address(token1), 100 * 1e8);
     }
 
@@ -113,7 +113,7 @@ contract D3VaultFundingTest is TestContext {
         addressList[0] = address(d3MM);
         quotaList[0] = 1;
         poolQuota.setPoolQuota(address(token1), addressList, quotaList);
-        vm.expectRevert(bytes(Errors.EXCEED_QUOTA));
+        vm.expectRevert(Errors.D3VaultExceedQuota.selector);
         poolBorrow(address(d3MM), address(token1), 100 * 1e8);
         // case 2.2: borrow not exceed pool quota
         quotaList[0] = 1000 * 1e8;
@@ -133,7 +133,7 @@ contract D3VaultFundingTest is TestContext {
         poolBorrow(address(d3MM), address(token1), 200 * 1e8);
 
         // case 4: pool borrow asset which is not the collateral token
-        vm.expectRevert(bytes(Errors.AMOUNT_EXCEED_VAULT_BALANCE));
+        vm.expectRevert(Errors.D3VaultAmountExceedVaultBalance.selector);
         poolBorrow(address(d3MM), address(token2), 1 ether); 
 
         vm.prank(user1);
@@ -205,7 +205,7 @@ contract D3VaultFundingTest is TestContext {
         assertEq(newBorrows2, 4795615411);
 
         // case: repay more than borrows
-        vm.expectRevert(bytes(Errors.AMOUNT_EXCEED));
+        vm.expectRevert(Errors.D3VaultAmountExceed.selector);
         d3Vault.poolRepay(address(token1), 4795615411 + 1);
 
         (,,,,,,,,,, uint256 balanceBefore) = d3Vault.getAssetInfo(address(token1));
@@ -261,7 +261,7 @@ contract D3VaultFundingTest is TestContext {
         userWithdraw(user1, address(token1), 10 * 1e8 - DEFAULT_MINIMUM_DTOKEN);
         userWithdraw(address(1), address(token1), DEFAULT_MINIMUM_DTOKEN);
 
-        vm.expectRevert(bytes(Errors.AMOUNT_EXCEED_VAULT_BALANCE));
+        vm.expectRevert(Errors.D3VaultAmountExceedVaultBalance.selector);
         poolBorrow(address(d3MM), address(token1), 1);
         uint256 getURatio = d3Vault.getUtilizationRatio(address(token1));
         assertEq(getURatio, 0);
