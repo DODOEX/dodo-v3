@@ -102,12 +102,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       sleep(10)
       
       console.log("setStableCurve for WETH...")
-      await D3RateManager.setStableCurve(config.defaultAddress.WETH, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.WETH, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
       
       sleep(10)
 
       console.log("setStableCurve for WstETH...")
-      await D3RateManager.setStableCurve(config.defaultAddress.wstETH, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.wstETH, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
     }
   }
 
