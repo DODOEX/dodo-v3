@@ -143,25 +143,25 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       const D3RateManager = await ethers.getContractAt("D3RateManager", rateManagerAddress);
       
       console.log("setStableCurve for WBTC...")
-      await D3RateManager.setStableCurve(config.defaultAddress.WBTC, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.WBTC, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
 
       console.log("setStableCurve for BTC...")
-      await D3RateManager.setStableCurve(config.defaultAddress.BTCb, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.BTCb, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
 
       console.log("setStableCurve for ETH...")
-      await D3RateManager.setStableCurve(config.defaultAddress.WETH, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.WETH, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
 
       console.log("setStableCurve for USDT...")
-      await D3RateManager.setStableCurve(config.defaultAddress.USDT, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.USDT, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
       
       console.log("setStableCurve for USDTe...")
-      await D3RateManager.setStableCurve(config.defaultAddress.USDTe, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.USDTe, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
 
       console.log("setStableCurve for USDC...")
-      await D3RateManager.setStableCurve(config.defaultAddress.USDC, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.USDC, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
 
       console.log("setStableCurve for WAVAX...")
-      await D3RateManager.setStableCurve(config.defaultAddress.WAVAX, padZeros(20, 16), padZeros(1, 18), padZeros(2, 18), padZeros(80, 16));
+      await D3RateManager.setStableCurve(config.defaultAddress.WAVAX, padZeros(2, 16), padZeros(10, 16), padZeros(50, 16), padZeros(80, 16));
     }
   }
 
