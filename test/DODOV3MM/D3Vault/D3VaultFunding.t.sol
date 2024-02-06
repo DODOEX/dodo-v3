@@ -220,6 +220,74 @@ contract D3VaultFundingTest is TestContext {
         vm.stopPrank();
     }
 
+    function testPoolRepayAllHasLeft() public {
+        vm.prank(user1);
+        token2.approve(address(dodoApprove), type(uint256).max);
+
+        mockUserQuota.setUserQuota(user1, address(token2), 1000 * 1e18);
+        token2.mint(user1, 1000 * 1e18);
+        vm.prank(user1);
+        d3Proxy.userDeposit(user1, address(token2), 500 * 1e18, 0);
+
+        token2.mint(address(d3MM), 100 * 1e18);
+        poolBorrow(address(d3MM), address(token2), 100 * 1e18);
+
+        for (uint256 i; i <= 365; i++) {
+            vm.warp(i * 24 * 3600 + 1);
+            d3Vault.accrueInterest(address(token2));
+            console.log("day", i);
+            logBorrows(address(token2));
+        }
+
+        vm.startPrank(address(d3MM));
+        token2.approve(address(d3Vault), type(uint256).max);
+        d3Vault.poolRepayAll(address(token2));
+        vm.stopPrank();
+
+        console.log("repay all");
+        logBorrows(address(token2));
+
+        assertEq(d3Vault.getTotalBorrows(address(token1)), 0);
+    }
+
+    function testPoolRepayAllSmallDecimals() public {
+        vm.prank(user1);
+        token1.approve(address(dodoApprove), type(uint256).max);
+
+        mockUserQuota.setUserQuota(user1, address(token1), 1000 * 1e8);
+        token1.mint(user1, 1000 * 1e8);
+        vm.prank(user1);
+        d3Proxy.userDeposit(user1, address(token1), 500 * 1e8, 0);
+
+        token1.mint(address(d3MM), 100 * 1e8);
+        poolBorrow(address(d3MM), address(token1), 100 * 1e8);
+
+        for (uint256 i; i <= 365; i++) {
+            vm.warp(i * 24 * 3600 + 1);
+            d3Vault.accrueInterest(address(token1));
+            console.log("day", i);
+            logBorrows(address(token1));
+        }
+
+        vm.startPrank(address(d3MM));
+        token1.approve(address(d3Vault), type(uint256).max);
+        d3Vault.poolRepayAll(address(token1));
+        vm.stopPrank();
+
+        console.log("repay all");
+        logBorrows(address(token1));
+
+        assertEq(d3Vault.getTotalBorrows(address(token1)), 0);
+    }
+
+    function logBorrows(address token) private {
+        uint256 poolBorrow = d3Vault.getPoolBorrowAmount(address(d3MM), token);
+        uint256 totalBorrow = d3Vault.getTotalBorrows(token);
+        console.log("pool Borrow", poolBorrow);
+        console.log("totalBorrow", totalBorrow);
+        console.log();
+    }
+
     function testCompoundInterestRate() public {
         assertEq(d3Vault.getCompoundInterestRate(3e18, 0), 1e18);
         assertEq(d3Vault.getCompoundInterestRate(3e18, 1), 4e18);
