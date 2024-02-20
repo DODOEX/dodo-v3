@@ -28,6 +28,7 @@ contract D3VaultStorage is ReentrancyGuard, Ownable {
     uint256 public IM; // 1e18 = 100%
     uint256 public MM; // 1e18 = 100%
     uint256 public DISCOUNT = 95e16; // 95%
+    uint256 public borrowerCount;
     uint256 internal constant SECONDS_PER_YEAR = 31536000;
     uint256 internal constant DEFAULT_MINIMUM_DTOKEN = 1000;
 

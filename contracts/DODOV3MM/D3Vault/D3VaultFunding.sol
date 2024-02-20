@@ -88,6 +88,7 @@ contract D3VaultFunding is D3VaultStorage {
 
         uint256 interests = usedQuota - record.amount;
 
+        if (record.amount == 0 && usedQuota + amount > 0) { borrowerCount++; }
         record.amount = usedQuota + amount;
         record.interestIndex = info.borrowIndex;
         info.totalBorrows = info.totalBorrows + amount;
@@ -116,6 +117,8 @@ contract D3VaultFunding is D3VaultStorage {
         } else {
             info.totalBorrows = info.totalBorrows - amount;
         }
+        if (record.amount == 0) { borrowerCount--; }
+        if (borrowerCount == 0) { info.totalBorrows = 0; }
         info.balance = info.balance + amount;
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
@@ -143,6 +146,8 @@ contract D3VaultFunding is D3VaultStorage {
         } else {
             info.totalBorrows = info.totalBorrows - amount;
         }
+        borrowerCount--;
+        if (borrowerCount == 0) { info.totalBorrows = 0; }
         info.balance = info.balance + amount;
         IERC20(token).safeTransferFrom(pool, address(this), amount);
 
