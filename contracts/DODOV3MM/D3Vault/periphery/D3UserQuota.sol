@@ -67,6 +67,9 @@ contract D3UserQuota is Ownable, ID3UserQuota {
     }
 
     /// @notice Get the user quota based on tier
+    /// @param user The address of the user
+    /// @param token The address of the token
+    /// @return quota The quota of the user based on tier
     function getTierQuota(address user, address token) public view returns (uint256 quota) {
         uint256 vTokenBalance = IERC20(_vTOKEN_).balanceOf(user);
         uint256[] memory tiers = vTokenTiers[token];
@@ -80,6 +83,9 @@ contract D3UserQuota is Ownable, ID3UserQuota {
     }
 
     /// @notice Get the used quota
+    /// @param user The address of the user
+    /// @param token The address of the token
+    /// @return The used quota
     function getUsedQuota(address user, address token) public view returns (uint256) {
         (address dToken,,,,,,,,,,) = d3Vault.getAssetInfo(token);
         uint256 dTokenBalance = IERC20(dToken).balanceOf(user);
@@ -88,6 +94,9 @@ contract D3UserQuota is Ownable, ID3UserQuota {
     }
 
     /// @notice Get the user quota for a token
+    /// @param user The address of the user
+    /// @param token The address of the token
+    /// @return The user quota for a token
     function getUserQuota(address user, address token) public view returns (uint256) {
         uint256 usedQuota = getUsedQuota(user, token);
         if (isUsingQuota[token]) {
@@ -102,6 +111,10 @@ contract D3UserQuota is Ownable, ID3UserQuota {
     }
 
     /// @notice Check if the quantity of tokens deposited by the user is allowed.
+    /// @param user The address of the user
+    /// @param token The address of the token
+    /// @param amount The amount of tokens to be deposited
+    /// @return A boolean value indicating whether the deposit is allowed
     function checkQuota(address user, address token, uint256 amount) public view returns (bool) {
         return (amount <= getUserQuota(user, token));
     }

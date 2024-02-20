@@ -167,6 +167,12 @@ contract D3Proxy is IDODOSwapCallback {
         require(dTokenAmount >= minDtokenAmount, "D3PROXY_MIN_DTOKEN_AMOUNT_FAIL");
     }
 
+    /// @notice User withdraws tokens from the pool
+    /// @param to The address to receive the withdrawn tokens
+    /// @param token The address of the token to withdraw
+    /// @param dTokenAmount The amount of dTokens to withdraw
+    /// @param minReceiveAmount The minimum amount of tokens to receive
+    /// @return amount The actual amount of tokens withdrawn
     function userWithdraw(address to, address token, uint256 dTokenAmount, uint256 minReceiveAmount) external payable returns(uint256 amount){
         if (token != _ETH_ADDRESS_) {
             (address dToken,,,,,,,,,,) = ID3Vault(_D3_VAULT_).getAssetInfo(token);

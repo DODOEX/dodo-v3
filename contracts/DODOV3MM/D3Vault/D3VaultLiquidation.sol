@@ -3,15 +3,23 @@ pragma solidity 0.8.16;
 
 import "./D3VaultFunding.sol";
 
+/// @title D3VaultLiquidation
+/// @dev This contract handles the liquidation process of the D3Vault
 contract D3VaultLiquidation is D3VaultFunding {
     using SafeERC20 for IERC20;
     using DecimalMath for uint256;
 
+    /// @notice Checks if the net worth of an asset is positive
+    /// @param pool The address of the pool
+    /// @param token The address of the token
     function isPositiveNetWorthAsset(address pool, address token) internal view returns (bool) {
         (uint256 balance, uint256 borrows) = _getBalanceAndBorrows(pool, token);
         return balance >= borrows;
     }
 
+    /// @notice Gets the positive net worth of an asset
+    /// @param pool The address of the pool
+    /// @param token The address of the token
     function getPositiveNetWorthAsset(address pool, address token) internal view returns (uint256) {
         (uint256 balance, uint256 borrows) = _getBalanceAndBorrows(pool, token);
         if (balance > borrows) {
@@ -21,7 +29,8 @@ contract D3VaultLiquidation is D3VaultFunding {
         }
     }
 
-    /// @notice public liquidate function, repay pool negative worth token and get collateral tokens with discount
+    /// @notice Public liquidation function.
+    /// @notice Anyone can call this function to repay pool's negative-worth token, and get collateral tokens with discount as reward.
     /// @param pool pool address, must be in belowMM
     /// @param collateral pool collateral, any positive worth token pool has
     /// @param collateralAmount collateral amount liquidator claim
@@ -70,7 +79,7 @@ contract D3VaultLiquidation is D3VaultFunding {
     }
 
     // ---------- Liquidate by DODO team ----------
-    /// @notice if occuring bad debt, dodo team will start liquidation to balance debt
+    /// @notice If pool has bad debt, DODO team will call this function to start liquidation process.
     function startLiquidation(address pool) external onlyLiquidator nonReentrant {
         accrueInterests();
 
@@ -94,6 +103,11 @@ contract D3VaultLiquidation is D3VaultFunding {
         emit StartLiquidation(pool);
     }
 
+    /// @notice Liquidate by DODO team
+    /// @param pool The address of the pool
+    /// @param order The liquidation order
+    /// @param routeData The route data for the swap
+    /// @param router The address of the router
     function liquidateByDODO(
         address pool,
         LiquidationOrder calldata order,
@@ -126,6 +140,8 @@ contract D3VaultLiquidation is D3VaultFunding {
         ID3MM(pool).updateReserveByVault(order.toToken);
     }
 
+    /// @notice Finish the liquidation process
+    /// @param pool The address of the pool
     function finishLiquidation(address pool) external onlyLiquidator nonReentrant {
         if (!ID3MM(pool).isInLiquidation()) revert Errors.D3VaultNotInLiquidation();
         accrueInterests();

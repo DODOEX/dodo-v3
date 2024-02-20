@@ -11,6 +11,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+/// @title D3Trading contract
+/// @notice This contract handles trading operations in the DODO V3 pool
+/// @dev This contract inherits from the D3Funding contract
 contract D3Trading is D3Funding {
     using SafeERC20 for IERC20;
 
@@ -21,16 +24,20 @@ contract D3Trading is D3Funding {
 
     // =============== Read ===============
 
-    /// @notice for external users to read tokenMMInfo
-    function getTokenMMPriceInfoForRead(
-        address token
-    )
+    /// @notice For external users to read tokenMMInfo
+    /// @notice This function returns the tokenMMInfo for a given token
+    /// @param token The address of the token
+    /// @return askDownPrice The ask down price of the token
+    /// @return askUpPrice The ask up price of the token
+    /// @return bidDownPrice The bid down price of the token
+    /// @return bidUpPrice The bid up price of the token
+    /// @return swapFee The swap fee rate of the token
+    function getTokenMMPriceInfoForRead(address token)
         external
         view
         returns (uint256 askDownPrice, uint256 askUpPrice, uint256 bidDownPrice, uint256 bidUpPrice, uint256 swapFee)
     {
-        (Types.TokenMMInfo memory tokenMMInfo, ) =
-            ID3Maker(state._MAKER_).getTokenMMInfoForPool(token);
+        (Types.TokenMMInfo memory tokenMMInfo,) = ID3Maker(state._MAKER_).getTokenMMInfoForPool(token);
 
         askDownPrice = tokenMMInfo.askDownPrice;
         askUpPrice = tokenMMInfo.askUpPrice;
@@ -39,9 +46,15 @@ contract D3Trading is D3Funding {
         swapFee = tokenMMInfo.swapFeeRate;
     }
 
-    function getTokenMMOtherInfoForRead(
-        address token
-    )
+    /// @notice This function allows users to read other information about the token
+    /// @param token The address of the token
+    /// @return askAmount The ask amount of the token
+    /// @return bidAmount The bid amount of the token
+    /// @return kAsk The kAsk value of the token
+    /// @return kBid The kBid value of the token
+    /// @return cumulativeAsk The cumulative ask value of the token
+    /// @return cumulativeBid The cumulative bid value of the token
+    function getTokenMMOtherInfoForRead(address token)
         external
         view
         returns (
@@ -65,7 +78,10 @@ contract D3Trading is D3Funding {
     }
 
     // ============ Swap =============
-    /// @notice get swap status for internal swap
+    /// @notice This function returns the state of the range order for the given pair of tokens.
+    /// @param fromToken The address of the token to be sold.
+    /// @param toToken The address of the token to be bought.
+    /// @return roState The state of the range order for the given pair of tokens.
     function getRangeOrderState(
         address fromToken,
         address toToken
@@ -88,7 +104,14 @@ contract D3Trading is D3Funding {
             allFlag >> (toTokenIndex) & 1 == 0 ? 0 : tokenCumMap[toToken].cumulativeBid;
     }
 
-    /// @notice user sell a certain amount of fromToken,  get toToken
+    /// @notice This function allows a user to sell a specific amount of tokens (user sell a certain amount of fromToken, get toToken).
+    /// @param to The address to send the sold tokens to.
+    /// @param fromToken The address of the token to be sold.
+    /// @param toToken The address of the token to be bought.
+    /// @param fromAmount The amount of fromToken to sell.
+    /// @param minReceiveAmount The minimum amount of toToken the user is willing to receive.
+    /// @param data Additional data to be passed to the function.
+    /// @return The actual amount of toToken received.
     function sellToken(
         address to,
         address fromToken,
@@ -111,7 +134,7 @@ contract D3Trading is D3Funding {
         // external call & swap callback
         IDODOSwapCallback(msg.sender).d3MMSwapCallBack(fromToken, fromAmount, data);
         // transfer mtFee to maintainer
-        if(mtFee > 0) {
+        if (mtFee > 0) {
             _transferOut(state._MAINTAINER_, toToken, mtFee);
         }
 
@@ -129,7 +152,15 @@ contract D3Trading is D3Funding {
         return receiveToAmount;
     }
 
-    /// @notice user ask for a certain amount of toToken, fromToken's amount will be determined by toToken's amount
+    /// @notice This function allows a user to buy a specific amount of tokens.
+    /// @notice User asks for a certain amount of toToken, fromToken's amount will be determined by toToken's amount.
+    /// @param to The address to send the bought tokens to.
+    /// @param fromToken The address of the token to be sold.
+    /// @param toToken The address of the token to be bought.
+    /// @param quoteAmount The amount of toToken to buy.
+    /// @param maxPayAmount The maximum amount of fromToken the user is willing to pay.
+    /// @param data Additional data to be passed to the function.
+    /// @return The actual amount of fromToken paid.
     function buyToken(
         address to,
         address fromToken,
@@ -153,7 +184,7 @@ contract D3Trading is D3Funding {
         // external call & swap callback
         IDODOSwapCallback(msg.sender).d3MMSwapCallBack(fromToken, payFromAmount, data);
         // transfer mtFee to maintainer
-        if(mtFee > 0 ) {
+        if (mtFee > 0) {
             _transferOut(state._MAINTAINER_, toToken, mtFee);
         }
 
@@ -180,27 +211,31 @@ contract D3Trading is D3Funding {
         address fromToken,
         address toToken,
         uint256 fromAmount
-    ) public view returns (uint256 payFromAmount, uint256 receiveToAmount, uint256 vusdAmount, uint256 swapFee, uint256 mtFee) {
+    )
+        public
+        view
+        returns (uint256 payFromAmount, uint256 receiveToAmount, uint256 vusdAmount, uint256 swapFee, uint256 mtFee)
+    {
         require(fromAmount > 1000, Errors.AMOUNT_TOO_SMALL);
         Types.RangeOrderState memory D3State = getRangeOrderState(fromToken, toToken);
 
         {
-        uint256 fromTokenDec = IERC20Metadata(fromToken).decimals();
-        uint256 toTokenDec = IERC20Metadata(toToken).decimals();
-        uint256 fromAmountWithDec18 = Types.parseRealAmount(fromAmount, fromTokenDec);
-        uint256 receiveToAmountWithDec18;
-        ( , receiveToAmountWithDec18, vusdAmount) =
-            PMMRangeOrder.querySellTokens(D3State, fromToken, toToken, fromAmountWithDec18);
+            uint256 fromTokenDec = IERC20Metadata(fromToken).decimals();
+            uint256 toTokenDec = IERC20Metadata(toToken).decimals();
+            uint256 fromAmountWithDec18 = Types.parseRealAmount(fromAmount, fromTokenDec);
+            uint256 receiveToAmountWithDec18;
+            (, receiveToAmountWithDec18, vusdAmount) =
+                PMMRangeOrder.querySellTokens(D3State, fromToken, toToken, fromAmountWithDec18);
 
-        receiveToAmount = Types.parseDec18Amount(receiveToAmountWithDec18, toTokenDec);
-        payFromAmount = fromAmount;
+            receiveToAmount = Types.parseDec18Amount(receiveToAmountWithDec18, toTokenDec);
+            payFromAmount = fromAmount;
         }
 
         receiveToAmount = receiveToAmount > state.balances[toToken] ? state.balances[toToken] : receiveToAmount;
 
-        uint256 swapFeeRate = D3State.fromTokenMMInfo.swapFeeRate +  D3State.toTokenMMInfo.swapFeeRate;
+        uint256 swapFeeRate = D3State.fromTokenMMInfo.swapFeeRate + D3State.toTokenMMInfo.swapFeeRate;
         swapFee = DecimalMath.mulFloor(receiveToAmount, swapFeeRate);
-        uint256 mtFeeRate = D3State.fromTokenMMInfo.mtFeeRate +  D3State.toTokenMMInfo.mtFeeRate;
+        uint256 mtFeeRate = D3State.fromTokenMMInfo.mtFeeRate + D3State.toTokenMMInfo.mtFeeRate;
         mtFee = DecimalMath.mulFloor(receiveToAmount, mtFeeRate);
 
         return (payFromAmount, receiveToAmount - mtFee, vusdAmount, swapFee, mtFee);
@@ -215,18 +250,22 @@ contract D3Trading is D3Funding {
         address fromToken,
         address toToken,
         uint256 toAmount
-    ) public view returns (uint256 payFromAmount, uint256 receiveToAmount, uint256 vusdAmount, uint256 swapFee, uint256 mtFee) {
+    )
+        public
+        view
+        returns (uint256 payFromAmount, uint256 receiveToAmount, uint256 vusdAmount, uint256 swapFee, uint256 mtFee)
+    {
         require(toAmount > 1000, Errors.AMOUNT_TOO_SMALL);
         Types.RangeOrderState memory D3State = getRangeOrderState(fromToken, toToken);
 
         // query amount and transfer out
         uint256 toAmountWithFee;
         {
-        uint256 swapFeeRate = D3State.fromTokenMMInfo.swapFeeRate +  D3State.toTokenMMInfo.swapFeeRate;
-        swapFee = DecimalMath.mulFloor(toAmount, swapFeeRate);
-        uint256 mtFeeRate = D3State.fromTokenMMInfo.mtFeeRate +  D3State.toTokenMMInfo.mtFeeRate;
-        mtFee = DecimalMath.mulFloor(toAmount, mtFeeRate);
-        toAmountWithFee = toAmount + mtFee;
+            uint256 swapFeeRate = D3State.fromTokenMMInfo.swapFeeRate + D3State.toTokenMMInfo.swapFeeRate;
+            swapFee = DecimalMath.mulFloor(toAmount, swapFeeRate);
+            uint256 mtFeeRate = D3State.fromTokenMMInfo.mtFeeRate + D3State.toTokenMMInfo.mtFeeRate;
+            mtFee = DecimalMath.mulFloor(toAmount, mtFeeRate);
+            toAmountWithFee = toAmount + mtFee;
         }
 
         require(toAmountWithFee <= state.balances[toToken], Errors.BALANCE_NOT_ENOUGH);
@@ -235,10 +274,10 @@ contract D3Trading is D3Funding {
         uint256 toTokenDec = IERC20Metadata(toToken).decimals();
         uint256 toFeeAmountWithDec18 = Types.parseRealAmount(toAmountWithFee, toTokenDec);
         uint256 payFromAmountWithDec18;
-        (payFromAmountWithDec18, , vusdAmount) =
+        (payFromAmountWithDec18,, vusdAmount) =
             PMMRangeOrder.queryBuyTokens(D3State, fromToken, toToken, toFeeAmountWithDec18);
         payFromAmount = Types.parseDec18Amount(payFromAmountWithDec18, fromTokenDec);
-        if(payFromAmount == 0) {
+        if (payFromAmount == 0) {
             payFromAmount = 1;
         }
 
@@ -247,6 +286,11 @@ contract D3Trading is D3Funding {
 
     // ================ internal ==========================
 
+    /// @notice Records the swap details and updates the reserves
+    /// @param fromToken The token being swapped from
+    /// @param toToken The token being swapped to
+    /// @param fromAmount The amount of fromToken being swapped
+    /// @param toAmount The amount of toToken being received
     function _recordSwap(address fromToken, address toToken, uint256 fromAmount, uint256 toAmount) internal {
         tokenCumMap[fromToken].cumulativeBid += fromAmount;
         tokenCumMap[toToken].cumulativeAsk += toAmount;
@@ -255,6 +299,8 @@ contract D3Trading is D3Funding {
         _updateReserve(toToken);
     }
 
+    /// @notice Updates the cumulative amounts for a given token
+    /// @param token The token for which the cumulative amounts are updated
     function _updateCumulative(address token) internal {
         uint256 tokenIndex = uint256(ID3Maker(state._MAKER_).getOneTokenOriginIndex(token));
         uint256 tokenFlag = (allFlag >> tokenIndex) & 1;
@@ -265,11 +311,18 @@ contract D3Trading is D3Funding {
         }
     }
 
+    /// @notice Transfers out a certain amount of a token to a specified address
+    /// @param to The address to transfer the token to
+    /// @param token The token to be transferred
+    /// @param amount The amount of token to be transferred
     function _transferOut(address to, address token, uint256 amount) internal {
         IERC20(token).safeTransfer(to, amount);
     }
 
     // ================ call by maker ==========================
+    /// @notice Updates the allFlag variable with a new value
+    /// @param newFlag The new value to be set for allFlag
+    /// @dev This function can only be called by the maker
     function setNewAllFlag(uint256 newFlag) external onlyMaker {
         allFlag = newFlag;
     }

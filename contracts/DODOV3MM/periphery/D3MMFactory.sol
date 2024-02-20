@@ -57,28 +57,39 @@ contract D3MMFactory is InitializableOwnable {
     // ============ Admin Function ============
 
     /// @notice Set new D3MM template
+    /// @param poolType The type of the pool
+    /// @param newTemp The address of the new template
     function setD3Temp(uint256 poolType, address newTemp) public onlyOwner {
         _D3POOL_TEMPS[poolType] = newTemp;
     }
+
     /// @notice Set new D3Maker template
+    /// @param poolType The type of the pool
+    /// @param newMakerTemp The address of the new maker template
     function setD3MakerTemp(uint256 poolType, address newMakerTemp) public onlyOwner {
         _D3MAKER_TEMPS_[poolType] = newMakerTemp;
     }
 
     /// @notice Set new CloneFactory contract address
+    /// @param cloneFactory The address of the new CloneFactory contract
     function setCloneFactory(address cloneFactory) external onlyOwner {
         _CLONE_FACTORY_ = cloneFactory;
     }
 
     /// @notice Set new oracle
+    /// @param oracle The address of the new oracle
     function setOracle(address oracle) external onlyOwner {
         _ORACLE_ = oracle;
     }
+
     /// @notice Set new maintainer
+    /// @param maintainer The address of the new maintainer
     function setMaintainer(address maintainer) external onlyOwner {
         _MAINTAINER_ = maintainer;
     }
+
     /// @notice Set new feeRateModel
+    /// @param feeRateModel The address of the new FeeRateModel
     function setFeeRate(address feeRateModel) external onlyOwner {
         _FEE_RATE_MODEL_ = feeRateModel;
     }
